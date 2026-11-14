@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-labelledby="title">
+  <title id="title">Hotaru app icon</title>
+  <defs>
+    <radialGradient id="glow" gradientUnits="userSpaceOnUse" cx="164" cy="203" r="110">
+      <stop offset="0" stop-color="#FFBE7A" stop-opacity="0.42"/>
+      <stop offset="0.25" stop-color="#FFBE7A" stop-opacity="0.28"/>
+      <stop offset="0.5" stop-color="#FFBE7A" stop-opacity="0.14"/>
+      <stop offset="0.75" stop-color="#FFBE7A" stop-opacity="0.045"/>
+      <stop offset="1" stop-color="#FFBE7A" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" fill="#17110E"/>
+  <g transform="translate(96 99) scale(1.25)">
+    <circle cx="164" cy="203" r="110" fill="url(#glow)"/>
+  <g id="symbol">
+    <path fill="#FFF6E8" d="M69 40 A15 15 0 0 1 99 40 V105.01 A55 55 0 0 1 179 154 A15 15 0 0 1 149 154 A25 25 0 0 0 99 154 V212 A15 15 0 0 1 69 212 Z"/>
+    <circle fill="#FFBE7A" cx="164" cy="203" r="24"/>
+  </g>
+  </g>
+</svg>

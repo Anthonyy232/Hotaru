@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 698 256" width="698" height="256" role="img" aria-labelledby="title">
+  <title id="title">Hotaru</title>
+  <g id="wordmark">
+    <path fill="none" stroke="#FFFFFF" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" d="M30 72 V200 M30 160 A40 40 0 0 1 110 160"/>
+    <circle fill="#FFFFFF" cx="110" cy="193" r="17"/>
+    <circle cx="194" cy="160" r="40" fill="none" stroke="#FFFFFF" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+    <path fill="none" stroke="#FFFFFF" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" d="M288 84 V172 A28 28 0 0 0 316 200 H324 M264 120 H320"/>
+    <circle cx="404" cy="160" r="40" fill="none" stroke="#FFFFFF" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+    <path fill="none" stroke="#FFFFFF" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" d="M444 120 V200"/>
+    <path fill="none" stroke="#FFFFFF" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" d="M496 120 V200 M496 160 A40 40 0 0 1 536 120 H542"/>
+    <path fill="none" stroke="#FFFFFF" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" d="M588 120 V160 A40 40 0 0 0 668 160 V120 M668 120 V200"/>
+  </g>
+</svg>

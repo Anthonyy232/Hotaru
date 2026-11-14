@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="hotaru_controls_panel" type="id" />
+    <item name="hotaru_cinema_panel" type="id" />
+    <item name="hotaru_status_panel" type="id" />
+    <style name="HotaruPanelTransparent" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:colorBackground">@android:color/transparent</item>
+    </style>
+</resources>
