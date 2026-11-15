@@ -1,6 +1,6 @@
 # Working on Hotaru
 
-A Jellyfin app for Meta Quest 3 and 3S: Kotlin, Compose, Media3 and the Meta Spatial SDK, as a panel window plus an immersive activity. Gradle needs JDK 21 in `JAVA_HOME` and `sdk.dir` in `local.properties`.
+A Jellyfin app for Meta Quest 3 and 3S: Kotlin, Compose, Media3 and the Meta Spatial SDK. Gradle needs JDK 21 in `JAVA_HOME` and `sdk.dir` in `local.properties`.
 
 ## Code
 
@@ -28,14 +28,10 @@ A Jellyfin app for Meta Quest 3 and 3S: Kotlin, Compose, Media3 and the Meta Spa
 
 ## Hotaru
 
-- Floors: Horizon OS v69, minSdk 34, arm64, Jellyfin 12.0. Nothing is released, so no compatibility code below them: no SDK version checks, shims, legacy endpoints or deprecated APIs.
-- `core/*` imports no Android, Compose, Spatial SDK or Jellyfin SDK types; `dependencyLint` (part of `check`) enforces the module edges. Logic goes in the lowest layer that can own it.
-- Use cases return `Outcome<T>`; nothing throws across layers. Every Jellyfin call goes through a use case, which owns the session and 401 handling.
-- The UI looks like visionOS: glass, white labels, bold titles, capsules, concentric corners. Colours, sizes and shapes come from the tokens in `ui/kit/Theme.kt`; build with Meta's Spatial UI set, which the kit re-themes, and keep its control sizes and hit targets. No fixed window widths.
-- A green build doesn't prove the scene works, and there is no emulator. Scene, playback and UI changes need a headset: the window, the cinema and switching between them, with hands and controllers.
-- With the headset on USB in developer mode, `tools/quest-deploy.ps1` installs and launches the debug build (optionally signed in) and records logcat and screenshots to `build/quest-run`; `tools/quest-dev.ps1` taps, swipes and captures through the debug-only bridge while nobody wears it.
-- The database migrates destructively until 1.0. When an entity or a stored JSON shape (`MediaItem`, `Settings`) changes, bump the version in `Database.kt` and replace the exported schema.
-- `LiveServerIntegrationTest` runs only with `HOTARU_DEV_SERVER`, `HOTARU_USER` and `HOTARU_PASSWORD` set. Never commit a server address or credentials.
+- Core modules use no Android, Compose, Spatial SDK or Jellyfin SDK types, and `check` enforces the module edges. Logic goes in the lowest layer that can own it; errors cross layers as values, not exceptions.
+- The UI looks like visionOS: glass with one warm accent, defined once in the shared tokens. Build with Meta's Spatial UI set and keep its control sizes and hit targets.
+- A green build doesn't prove the scene works, and there is no emulator: UI and playback changes can only be verified on a headset, with hands and controllers.
+- Never commit a server address, credentials or signing material.
 
 ## Done means
 
@@ -65,12 +61,11 @@ A Jellyfin app for Meta Quest 3 and 3S: Kotlin, Compose, Media3 and the Meta Spa
 
 ## Releases
 
-- None yet. Bump commit `chore: release vX.Y.Z`; tag `vX.Y.Z`.
+- Bump commit `chore: release vX.Y.Z`; tag `vX.Y.Z`, which must match the app's `versionName`.
 - Title `Hotaru X.Y.Z`.
 - Notes: banner image first, then `### New`, `### Improved`, `### Fixed` (only those that apply). One line per change, written for users; no internals, dependency lists or test counts. End with the install link(s) and the full changelog link.
-- Banner: 1280x640 in the README's style, on an orphan `media` branch as `releases/<tag>.png`; reference its raw URL.
-- Before the first APK: `media3-ffmpeg-decoder` is GPL-3.0 and can't ship in one APK with Meta's proprietary Spatial SDK. Drop it or get Jellyfin's permission first.
-- A release build is signed from `hotaru.keystore*` and `hotaru.key*` in `~/.gradle/gradle.properties`, never from the repo.
+- Banner: on the orphan `media` branch, `node banner.cjs <version> "<highlight>"` writes `releases/v<version>.png`; reference its raw URL. The branch's README has the steps.
+- Licensed MPL-2.0 because the app links Meta's proprietary Spatial SDK. The GPL-3.0 `media3-ffmpeg-decoder` can't ship in an APK with that SDK, so releases are source-only until it is dropped or Jellyfin gives permission.
 
 ## Agents
 
