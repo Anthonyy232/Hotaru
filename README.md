@@ -86,4 +86,10 @@ Changes to the scene, playback or UI also need checking on a headset, in the win
 
 The logo and its colours are in [branding](branding/guidelines.md).
 
+## License
+
+Copyright (c) 2026 Anthony La.
+
+Hotaru is licensed under the [Mozilla Public License 2.0](LICENSE) and comes with no warranty. You can use it and combine it with other software; changes to its files stay open.
+
 Hotaru is an independent project and is not affiliated with Jellyfin or Meta.
