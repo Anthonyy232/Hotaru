@@ -1,6 +1,6 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset=".github/readme/hero-dark.png">
-  <img src=".github/readme/hero-light.png" alt="Hotaru: your library, on a giant screen. The home screen shows a featured episode with Resume and Details, and a Continue Watching row.">
+  <img src=".github/readme/hero-light.png" alt="Hotaru: your library, on a giant screen. The home screen shows a featured episode with Resume and Details.">
 </picture>
 
 Hotaru is a [Jellyfin](https://jellyfin.org) app for Meta Quest 3 and 3S. You browse your library in a window, play a video there, and move it at any point to an immersive cinema with a screen up to 12 metres wide.
@@ -14,7 +14,7 @@ It is at version 0.1.0 and has no published builds yet, so for now you [build it
 
 - **Home** features one item to resume or play, then rows for Continue Watching, Next Up and the latest additions to each library.
 - **Libraries** each get a tab: movies, shows, home videos, music videos, collections, playlists and mixed folders. Sort by name, recently added or latest releases, and filter to unplayed or favorites. Music, books, photos and live TV libraries are not shown.
-- **Search** covers movies, shows and episodes.
+- **Search** covers movies, shows, episodes, collections and videos.
 - **Details** has Play or Resume, From start, favorite and played toggles, seasons and episodes, and More like this.
 
 The window resizes freely, down to 640 × 400 dp. Everything works with hands or controllers.
@@ -76,7 +76,7 @@ A release build reads its signing key from `hotaru.keystore`, `hotaru.keystorePa
 
 ## Contributing
 
-[AGENTS.md](AGENTS.md) describes the architecture and conventions. Before sending a change, run:
+[AGENTS.md](AGENTS.md) describes the conventions. Before sending a change, run:
 
 ```
 ./gradlew check :app:quest:assembleDebug

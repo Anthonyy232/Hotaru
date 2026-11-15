@@ -65,8 +65,10 @@ A Jellyfin app for Meta Quest 3 and 3S: Kotlin, Compose, Media3 and the Meta Spa
 
 ## Releases
 
-- None yet. The first will be: bump commit `chore: release vX.Y.Z`, tag `vX.Y.Z`, title `Hotaru X.Y.Z`.
+- None yet. Bump commit `chore: release vX.Y.Z`; tag `vX.Y.Z`.
+- Title `Hotaru X.Y.Z`.
 - Notes: banner image first, then `### New`, `### Improved`, `### Fixed` (only those that apply). One line per change, written for users; no internals, dependency lists or test counts. End with the install link(s) and the full changelog link.
+- Banner: 1280x640 in the README's style, on an orphan `media` branch as `releases/<tag>.png`; reference its raw URL.
 - Before the first APK: `media3-ffmpeg-decoder` is GPL-3.0 and can't ship in one APK with Meta's proprietary Spatial SDK. Drop it or get Jellyfin's permission first.
 - A release build is signed from `hotaru.keystore*` and `hotaru.key*` in `~/.gradle/gradle.properties`, never from the repo.
 

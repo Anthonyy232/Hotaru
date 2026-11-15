@@ -94,7 +94,7 @@ h2 { font-size: clamp(2.5rem, 5.5vw, 4rem); }
 
 code { font-family: var(--mono); font-size: 0.9em; }
 pre {
-  margin: 0; padding: 1.5rem; overflow-x: auto;
+  margin: 0; padding: 1.5rem; white-space: pre-wrap; overflow-wrap: anywhere;
   background: var(--surface); border: 1px solid var(--line); border-radius: 1rem;
   line-height: 1.8;
 }
