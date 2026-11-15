@@ -1,104 +1,78 @@
 # Working on Hotaru
 
-Conventions for anyone changing this codebase, human or AI.
-
-## Targets
-
-This is a new app with nothing released. Write for these floors only:
-
-- Quest 3 / 3S, Horizon OS v69+ (hybrid apps: a panel window plus an immersive activity), Android
-  minSdk 34, arm64
-- Jellyfin server 12.0+
-- Current Kotlin, Compose, Media3, Room, Metro and Spatial SDK APIs; JDK 21
-
-No compatibility code for anything below them: no SDK version checks, compat shims, legacy
-endpoints, auth or formats, fallbacks for other devices, or deprecated APIs where a current one
-exists. Other platforms are speculative: keep the core platform-neutral, but build no hosts, targets
-or setup for them.
-
-## Architecture
-
-- **Respect the layering.** `core/*` has no Android, Compose, Spatial SDK or Jellyfin SDK imports,
-  and SDK types stay in their adapter. `dependencyLint` enforces the module edges.
-- **Put logic in the lowest layer that can own it.** Rules in `core/domain`, workflows in
-  `core/application` use cases, screen state in `core/presentation` view models. `ui`, `platform`
-  and `app` stay thin.
-- **Ports** (`core/application/.../ports`) only where a layer boundary needs one.
-- **Use cases** return `Outcome<T>` with typed `AppError`s; don't throw across layers. Every
-  Jellyfin call goes through a use case, because it owns the session and 401 handling. Don't add
-  use cases that only forward to an app-scoped port; the view model calls the port.
-- **Metro DI** with constructor injection. Each adapter contributes its own binding; session-bound
-  objects come from factories.
+A Jellyfin app for Meta Quest 3 and 3S: Kotlin, Compose, Media3 and the Meta Spatial SDK, as a panel window plus an immersive activity. Gradle needs JDK 21 in `JAVA_HOME` and `sdk.dir` in `local.properties`.
 
 ## Code
 
-- **Simple and direct.** Solve today's problem; no speculative options, abstractions or extension
-  points.
-- **Stay in scope.** Build what was asked; suggest extras instead of adding them.
-- **Not defensive.** Handle what really happens: network errors, unreachable servers, 401s,
-  cancellation, optional fields real servers omit. No null checks, `?:` defaults, `else` branches
-  on exhaustive `when`s or `try`/`catch` for things that can't happen; let programmer errors fail
-  loudly.
-- **No fallbacks or workarounds** unless a real platform or server quirk needs one; then say why in
-  a comment.
-- **Don't hand-roll** what the SDKs, a dependency or this repo already provide. Search first.
-- **Delete dead code** you find or create: unused members, params always passed the same value,
-  unreachable branches, unused resources, imports and dependencies.
-- **Match the surrounding code**: naming, structure, comment density, idioms.
-- **Fix it everywhere.** After fixing a bug or a convention slip, look for the same pattern
-  elsewhere.
-- **UI looks like visionOS**: glass, white labels, bold titles, capsules and concentric corners, from
-  `ui/kit`'s tokens. Build with Meta's Spatial UI set, which the kit re-themes, and `ui/kit` for
-  what it lacks; keep the set's control sizes and hit targets, never fixed window widths.
+- Simple and direct. No speculative abstractions, options or extension points.
+- Stay in scope; suggest extras instead of adding them.
+- Use what the platform, framework, dependencies and this repo already provide before writing a helper.
+- Validate only at real boundaries (user input, storage, network, other processes). No checks, fallbacks or try/catch for cases that can't happen.
+- One source of truth for each value or rule.
+- Delete dead code you find or create.
+- Match the surrounding code.
+- Fix root causes, and fix the same pattern everywhere it occurs.
 
 ## Comments
 
-- Only for a non-obvious **why**: a Jellyfin or Horizon OS quirk, a constraint, a surprising
-  decision. One tight line where possible.
-- No restating code, section banners, history, review notes or references to old decisions.
-- KDoc only when it adds what the signature doesn't: units, ranges, what `null` means, ordering.
+- Only where the reason isn't clear from the code: a quirk, a race, a non-obvious decision.
+- Short fragments, not sentences. Never restate code, narrate, or label sections.
+- Delete comments that no longer match.
 
 ## Tests
 
-- Test behaviour that can break: session and auth, playback reporting, tracks, caching, window vs
-  immersive rules, device profiles.
-- No trivial, obvious or duplicate tests; one meaningful scenario beats several that restate each
-  other.
-- Build classes with the shared fakes, not the DI graph, and use virtual time, not sleeps.
+- Behaviour and the edges that can break. No trivial, duplicate, obvious or low-signal tests.
+- A regression test fails without its fix.
+- Deterministic: fake time and observable events, no sleeps.
+- A failing test is a bug until shown otherwise.
+
+## Hotaru
+
+- Floors: Horizon OS v69, minSdk 34, arm64, Jellyfin 12.0. Nothing is released, so no compatibility code below them: no SDK version checks, shims, legacy endpoints or deprecated APIs.
+- `core/*` imports no Android, Compose, Spatial SDK or Jellyfin SDK types; `dependencyLint` (part of `check`) enforces the module edges. Logic goes in the lowest layer that can own it.
+- Use cases return `Outcome<T>`; nothing throws across layers. Every Jellyfin call goes through a use case, which owns the session and 401 handling.
+- The UI looks like visionOS: glass, white labels, bold titles, capsules, concentric corners. Colours, sizes and shapes come from the tokens in `ui/kit/Theme.kt`; build with Meta's Spatial UI set, which the kit re-themes, and keep its control sizes and hit targets. No fixed window widths.
+- A green build doesn't prove the scene works, and there is no emulator. Scene, playback and UI changes need a headset: the window, the cinema and switching between them, with hands and controllers.
+- With the headset on USB in developer mode, `tools/quest-deploy.ps1` installs and launches the debug build (optionally signed in) and records logcat and screenshots to `build/quest-run`; `tools/quest-dev.ps1` taps, swipes and captures through the debug-only bridge while nobody wears it.
+- The database migrates destructively until 1.0. When an entity or a stored JSON shape (`MediaItem`, `Settings`) changes, bump the version in `Database.kt` and replace the exported schema.
+- `LiveServerIntegrationTest` runs only with `HOTARU_DEV_SERVER`, `HOTARU_USER` and `HOTARU_PASSWORD` set. Never commit a server address or credentials.
 
 ## Done means
 
-- You have **reviewed your own diff against this file**: over-engineering, over-abstraction,
-  defensive code, hand-rolled or duplicated code, low-signal tests, restating comments.
-- `./gradlew check :app:quest:assembleDebug` passes with **zero warnings** and **all tests green**.
-- Spatial, playback and UI changes are **checked on a headset**, in the window and in immersive and
-  switching between them, with hands and controllers (scripts in `tools/`). A green build doesn't
-  prove the scene works.
-- Behaviour changes are deliberate and called out.
+- Diff reviewed against this file.
+- `./gradlew check :app:quest:assembleDebug` passes with zero warnings.
+- UI changes seen in the running app on a headset. Docs and metadata changes need no end-to-end run.
+- README updated for anything users will notice; behaviour changes called out.
 
-## Dependencies and data
+## Docs
 
-- For a major version bump, read the release notes and check each breaking change against how
-  Hotaru uses the library.
-- The database migrates destructively until 1.0. When an entity or a stored JSON shape (`MediaItem`,
-  `Settings`) changes, bump the version in `Database.kt` and commit the new exported schema in place
-  of the old one.
+- README is for users: what it does, how to get it, how to use it. No internals, no agent instructions.
+- This file is for agents: only what can't be found quickly in the code.
+- No meta docs in the repo (notes, audits, plans, reports).
 
 ## Git
 
-- **Commit messages are short and informal**: a lowercase summary of the outcome with no prefix or
-  trailing punctuation, e.g. `pause when the headset comes off`; bullets under a blank line only
-  when they help.
-- **No co-authors or AI attribution** in commits, branches or PRs.
-- One logical change per commit; squash fix-ups into the commit they fix before pushing.
-- Don't commit generated output, local config (`local.properties`) or secrets.
+- `type: summary` or `type(scope): summary`: lowercase, imperative, no full stop, about 70 characters at most. Types: `feat` `fix` `refactor` `perf` `test` `docs` `style` `build` `ci` `chore`.
+- Body only to say why. `Fixes #123` closes an issue.
+- One logical change per commit. Squash fix-ups before merging.
+- Branch off `main`. A single commit fast-forwards; several merge with `merge: <summary>`.
+- No AI attribution in commits, branches, PRs or releases.
+- One maintainer: amending and force-pushing to tidy history is fine. Keep contributors as authors. Delete stale branches.
 
-## For AI agents
+## Pull requests
 
-- Ask before anything hard to undo or visible to others: pushing (approval to commit isn't approval
-  to push), opening PRs, deleting branches, rewriting published history.
-- Leave changes you didn't make alone, and clean up scratch files and background processes when
-  done.
-- Report honestly: what was verified and how, what still needs a headset, and anything you changed
-  on the headset or machine.
-- Keep replies short; give one clear recommendation rather than a list of options.
+- Title in commit format. Body: what changed, why, how it was checked. Short.
+
+## Releases
+
+- None yet. The first will be: bump commit `chore: release vX.Y.Z`, tag `vX.Y.Z`, title `Hotaru X.Y.Z`.
+- Notes: banner image first, then `### New`, `### Improved`, `### Fixed` (only those that apply). One line per change, written for users; no internals, dependency lists or test counts. End with the install link(s) and the full changelog link.
+- Before the first APK: `media3-ffmpeg-decoder` is GPL-3.0 and can't ship in one APK with Meta's proprietary Spatial SDK. Drop it or get Jellyfin's permission first.
+- A release build is signed from `hotaru.keystore*` and `hotaru.key*` in `~/.gradle/gradle.properties`, never from the repo.
+
+## Agents
+
+- Pushing, amending and force-pushing are allowed. Ask before publishing a release or submitting to a store.
+- Leave changes you didn't make alone. Clean up scratch files, processes and emulators.
+- Say what was checked and how, and what wasn't.
+- Short replies; one recommendation, not a list of options.
