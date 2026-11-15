@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hotaru: Jellyfin for Meta Quest 3 and 3S</title>
+<meta name="description" content="Hotaru is a Jellyfin app for Meta Quest 3 and 3S. Browse your library in a window, then watch in an immersive cinema with a screen up to 12 metres wide.">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#17110E" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#FFF6E8" media="(prefers-color-scheme: light)">
+<meta property="og:title" content="Hotaru: your library, on a giant screen">
+<meta property="og:description" content="A Jellyfin app for Meta Quest 3 and 3S. Browse in a window, then watch in an immersive cinema.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://anthonyy232.github.io/Hotaru/">
+<link rel="canonical" href="https://anthonyy232.github.io/Hotaru/">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top wrap">
+  <a class="mark" href="./" aria-label="Hotaru">
+    <svg viewBox="0 0 698 256" aria-hidden="true">
+      <g fill="none" stroke="currentColor" stroke-width="20" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M30 72V200M30 160A40 40 0 0 1 110 160"/>
+        <circle cx="194" cy="160" r="40"/>
+        <path d="M288 84V172A28 28 0 0 0 316 200H324M264 120H320"/>
+        <circle cx="404" cy="160" r="40"/>
+        <path d="M444 120V200"/>
+        <path d="M496 120V200M496 160A40 40 0 0 1 536 120H542"/>
+        <path d="M588 120V160A40 40 0 0 0 668 160V120M668 120V200"/>
+      </g>
+      <circle class="dot" cx="110" cy="193" r="17"/>
+    </svg>
+  </a>
+  <nav aria-label="Site">
+    <a href="#features">Features</a>
+    <a href="#build">Build</a>
+    <a href="https://github.com/Anthonyy232/Hotaru">GitHub</a>
+  </nav>
+</header>
+
+<main id="main">
+  <section class="hero wrap">
+    <h1>your library,<br>on a <em>giant</em> screen</h1>
+    <p class="lede">A Jellyfin app for Meta Quest 3 and 3S. Browse in a window, then watch in an immersive cinema.</p>
+    <div class="actions">
+      <a class="button primary" href="#build">Build from source</a>
+      <a class="button" href="https://github.com/Anthonyy232/Hotaru">View on GitHub</a>
+    </div>
+    <p class="note">Hotaru is at version 0.1.0 and has no published builds yet.</p>
+    <picture>
+      <source media="(prefers-color-scheme: light)" srcset="img/hero-light.webp">
+      <img class="hero-shot" src="img/hero-dark.webp" width="1696" height="503" alt="Render of the home screen: a featured episode with Resume and Details buttons, and the tab bar beside the window.">
+    </picture>
+  </section>
+
+  <section id="features" class="features wrap" aria-label="Features">
+    <article class="feature">
+      <div class="copy">
+        <p class="num">01</p>
+        <h2>Browse in a <em>window</em></h2>
+        <p>Your libraries sit in a window you can resize: continue watching, next up, latest additions, search, and filters for unplayed and favorites.</p>
+        <ul>
+          <li>Movies, shows, home videos, music videos, collections and playlists each get a tab.</li>
+          <li>Sort by name, recently added or latest releases.</li>
+          <li>Everything works with hands or controllers.</li>
+        </ul>
+      </div>
+      <picture>
+        <source media="(prefers-color-scheme: light)" srcset="img/browse-light.webp">
+        <img src="img/browse-dark.webp" width="980" height="808" loading="lazy" alt="Render of a Movies library as a grid of posters with a sort button, and the tab bar beside the window.">
+      </picture>
+    </article>
+
+    <article class="feature">
+      <div class="copy">
+        <p class="num">02</p>
+        <h2>Every track, <em>in reach</em></h2>
+        <p>Switch audio and subtitles, change speed, nudge subtitle timing and skip intros without leaving the picture.</p>
+        <ul>
+          <li>Styled ASS subtitles are drawn by libass, animation included. SRT, WebVTT and TTML work too.</li>
+          <li>Chapter marks on the seek bar, and preview thumbnails while you scrub.</li>
+          <li>Direct play first, then a remux, then a transcode. HDR is passed through where the headset supports it.</li>
+        </ul>
+      </div>
+      <picture>
+        <source media="(prefers-color-scheme: light)" srcset="img/player-light.webp">
+        <img src="img/player-dark.webp" width="980" height="808" loading="lazy" alt="Render of the player: a control bar with a seek bar and chapter marks, and a panel for audio tracks, subtitle tracks, speed and subtitle delay.">
+      </picture>
+    </article>
+
+    <article class="feature">
+      <div class="copy">
+        <p class="num">03</p>
+        <h2>A <em>cinema</em> to yourself</h2>
+        <p>Go immersive and the video becomes a screen from 1 to 12 metres wide. Keep your room in passthrough, dim it, or turn it off.</p>
+        <ul>
+          <li>Moving between the window and the cinema doesn't restart what is playing.</li>
+          <li>Side-by-side and top-and-bottom 3D plays in stereo.</li>
+          <li>180° and 360° videos surround you.</li>
+        </ul>
+      </div>
+      <picture>
+        <source media="(prefers-color-scheme: light)" srcset="img/cinema-light.webp">
+        <img src="img/cinema-dark.webp" width="980" height="808" loading="lazy" alt="Render of the immersive cinema: a large screen with subtitles, the control bar under it, and a panel with a screen size slider and surroundings options.">
+      </picture>
+    </article>
+  </section>
+
+  <section id="build" class="build wrap">
+    <div class="copy">
+      <h2>Build it <em>yourself</em></h2>
+      <p>There is no download yet. You need JDK 21, the Android SDK with <code>sdk.dir</code> set in <code>local.properties</code>, and a headset in developer mode.</p>
+      <p>Hotaru needs Horizon OS v69 or newer and a Jellyfin server on 12.0 or newer.</p>
+      <div class="actions">
+        <a class="button primary" href="https://github.com/Anthonyy232/Hotaru#building-from-source">Build instructions</a>
+        <a class="button" href="https://github.com/Anthonyy232/Hotaru">Source on GitHub</a>
+      </div>
+    </div>
+    <pre tabindex="0" aria-label="Build commands"><code>git clone https://github.com/Anthonyy232/Hotaru.git
+cd Hotaru
+./gradlew :app:quest:assembleDebug
+adb install -r app/quest/build/outputs/apk/debug/quest-debug.apk</code></pre>
+  </section>
+</main>
+
+<footer class="wrap">
+  <p>The images on this page are renders drawn from the app's own colours and layout, with invented titles.</p>
+  <p>Hotaru is licensed under the <a href="https://github.com/Anthonyy232/Hotaru/blob/main/LICENSE">Mozilla Public License 2.0</a>. It is an independent project, not affiliated with Jellyfin or Meta.</p>
+</footer>
+</body>
+</html>
