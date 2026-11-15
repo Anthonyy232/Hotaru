@@ -3,22 +3,38 @@ updates:
   - package-ecosystem: gradle
     directory: /
     schedule:
-      interval: weekly
+      interval: monthly
     cooldown:
       default-days: 5
     groups:
-      gradle:
+      # Only verifiable on a headset, so never auto-merged.
+      runtime:
+        patterns:
+          - androidx*
+          - com.meta.spatial*
+          - com.squareup.okhttp3*
+          - io.coil-kt*
+          - io.github.peerless2012*
+          - jakarta.inject*
+          - org.jellyfin*
+          - org.jetbrains.kotlinx*
+          - org.slf4j:slf4j-android
+      minor-patch:
         update-types: [minor, patch]
+      major:
+        update-types: [major]
     commit-message:
       prefix: chore(deps)
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: weekly
+      interval: monthly
     cooldown:
       default-days: 5
     groups:
-      actions:
+      minor-patch:
         update-types: [minor, patch]
+      major:
+        update-types: [major]
     commit-message:
       prefix: chore(deps)
