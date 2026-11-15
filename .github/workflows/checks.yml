@@ -23,4 +23,4 @@ jobs:
           distribution: temurin
           java-version: 21
       - uses: gradle/actions/setup-gradle@v6.4.1
-      - run: ./gradlew check :app:quest:assembleDebug
+      - run: ./gradlew check :app:quest:assembleDebug --warning-mode all
