@@ -64,7 +64,8 @@ A Jellyfin app for Meta Quest 3 and 3S: Kotlin, Compose, Media3 and the Meta Spa
 - Bump commit `chore: release vX.Y.Z`; tag `vX.Y.Z`, which must match the app's `versionName`.
 - Title `Hotaru X.Y.Z`.
 - Notes: banner image first, then `### New`, `### Improved`, `### Fixed` (only those that apply). One line per change, written for users; no internals, dependency lists or test counts. End with the install link(s) and the full changelog link.
-- Banner: on the orphan `media` branch, `node banner.cjs <version> "<highlight>"` writes `releases/v<version>.png`; reference its raw URL. The branch's README has the steps.
+- Banner: on the orphan `media` branch, `node releases/banner.cjs <checkout> <version> "<highlight>"` writes `releases/v<version>.png`; reference its raw URL.
+- Generated images (`.github/readme/`, `site/img/`, the banners) are built from the `media` branch; its README has the steps.
 - Licensed MPL-2.0 because the app links Meta's proprietary Spatial SDK. The GPL-3.0 `media3-ffmpeg-decoder` can't ship in an APK with that SDK, so releases are source-only until it is dropped or Jellyfin gives permission.
 
 ## Agents
