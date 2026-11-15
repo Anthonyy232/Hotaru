@@ -38,7 +38,12 @@ android {
     }
     buildFeatures { compose = true; buildConfig = true }
     packaging {
-        resources.excludes += setOf("META-INF/LICENSE*", "META-INF/NOTICE*", "META-INF/INDEX.LIST")
+        resources {
+            excludes += "META-INF/INDEX.LIST"
+            // AGP drops these by default; the licences want them shipped.
+            excludes -= setOf("/META-INF/LICENSE", "/META-INF/LICENSE.txt", "/META-INF/NOTICE", "/META-INF/NOTICE.txt")
+            merges += setOf("META-INF/LICENSE*", "META-INF/NOTICE*")
+        }
     }
 }
 
