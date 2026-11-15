@@ -402,7 +402,7 @@ abstract class QuestSceneHost : AppSystemActivity() {
     }
 
     /**
-     * Android's own animator: Spatial SDK 0.14 has no tween facility, and it steps on the main thread with the scene.
+     * Android's own animator: Spatial SDK has no tween facility, and it steps on the main thread with the scene.
      * [then] runs only when the fade completes; cancel() also calls onAnimationEnd.
      */
     private fun fade(from: Float, to: Float, step: (Float) -> Unit, then: () -> Unit = {}): Animator =
