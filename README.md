@@ -1,14 +1,51 @@
 # Hotaru media
 
-Release banners for [Hotaru](https://github.com/Anthonyy232/Hotaru), kept off `main` so it stays light.
+Generated images for [Hotaru](https://github.com/Anthonyy232/Hotaru), kept off `main` so it stays light: the release banners, the README panels, the site images and the social preview.
 
-The script needs Node and Playwright with Chromium: `npm install playwright` in any folder and point `NODE_PATH` at its `node_modules`. From a Hotaru checkout:
+| Path | What |
+| --- | --- |
+| `lib.cjs` | Shared by both scripts: the bundled fonts, the logo read from a Hotaru checkout, screenshots. |
+| `releases/banner.cjs`, `banners.json` | Release banners, `releases/v<version>.png`. |
+| `readme/build.cjs` | Every README, site and social image, written into a Hotaru checkout. |
+| `fonts/` | Instrument Serif and Inter, under the SIL Open Font License. Nothing is fetched at build time. |
+
+## Setup
+
+Needs Node. From a Hotaru checkout on `main`:
 
 ```bash
 git worktree add build/media media
-node build/media/banner.cjs 0.1.0 "One short highlight"
+cd build/media
+npm ci
+npx playwright install chromium
 ```
 
-That records the highlight in `banners.json` and writes `releases/v0.1.0.png` (1280x640). Without arguments it redraws every banner. Commit, push, and use the raw URL in the release notes:
+Both scripts take the path of the Hotaru checkout as their first argument; they read the logo from its `branding/`.
+
+## Release banner
+
+```bash
+node releases/banner.cjs ../.. 0.1.0 "One short highlight"
+```
+
+That records the highlight in `releases/banners.json` and writes `releases/v0.1.0.png` (1280x640). With only the checkout path it redraws every banner. Commit, push, and use the raw URL in the release notes:
 
 `https://raw.githubusercontent.com/Anthonyy232/Hotaru/media/releases/v0.1.0.png`
+
+## README, site and social images
+
+```bash
+node readme/build.cjs ../..
+```
+
+That writes into the checkout:
+
+- `.github/readme/hero-{light,dark}.png` and `feature-{browse,player,cinema}-{light,dark}.png`, at 1.6x.
+- `site/img/{hero,browse,player,cinema}-{light,dark}.webp`, the same images cropped to their stage.
+- `site/img/social.png`, 1280x640, which is also uploaded by hand as the repository's social preview.
+
+Commit the changed images on `main`.
+
+There are no screenshots: the app runs only on a headset, so each scene in `readme/build.cjs` redraws it in HTML and CSS from the tokens in `ui/kit` (`Theme.kt`, `Glass.kt`) and the screens' layout in dp, scaled into its stage. The titles and artwork are invented. When the app's look changes, change the scenes to match. The README and site say these images are renders.
+
+Body text uses the system UI font and the step numbers its monospace font, so a build on another OS can differ slightly in those; the headlines and the app's text use the bundled fonts.

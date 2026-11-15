@@ -1,21 +1,19 @@
-// node banner.cjs [<version> "<highlight>"] : 1280x640 release banners in releases/
-const { chromium } = require('playwright');
+// node releases/banner.cjs <checkout> [<version> "<highlight>"] : 1280x640 release banners in releases/
 const fs = require('fs');
+const { logo, launch } = require('../lib.cjs');
+
 const dir = __dirname;
 const file = `${dir}/banners.json`;
 const banners = JSON.parse(fs.readFileSync(file, 'utf8'));
-const [version, highlight] = process.argv.slice(2);
+const [checkout, version, highlight] = process.argv.slice(2);
+if (!checkout) throw new Error('usage: node releases/banner.cjs <checkout> [<version> "<highlight>"]');
 if (version) {
   banners[version] = highlight;
   fs.writeFileSync(file, JSON.stringify(banners, null, 2) + '\n');
 }
-const mark = fs.readFileSync(`${dir}/logo.svg`, 'utf8')
-  .replace(/<title.*?<\/title>/, '')
-  .replace(' width="256" height="256" role="img" aria-labelledby="title"', '');
+const mark = logo(checkout, 'hotaru-symbol.svg');
 
-const html = (v, text) => `<!doctype html><meta charset="utf-8">
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-<style>
+const html = (v, text) => `<style>
   * { box-sizing: border-box; }
   body { margin: 0; width: 1280px; height: 640px; overflow: hidden; display: grid; grid-template-columns: 1fr 470px; background: #17110E; color: #FFF6E8; font-family: system-ui, sans-serif; }
   .copy { padding: 64px 40px 60px 80px; display: flex; flex-direction: column; }
@@ -39,14 +37,9 @@ const html = (v, text) => `<!doctype html><meta charset="utf-8">
 const accent = text => text.replace(/(\S+)$/, '<i>$1</i>');
 
 (async () => {
-  const browser = await chromium.launch();
+  const { shoot, close } = await launch();
   for (const [v, text] of version ? [[version, highlight]] : Object.entries(banners)) {
-    const page = await browser.newPage({ viewport: { width: 1280, height: 640 } });
-    await page.setContent(html(v, accent(text)), { waitUntil: 'networkidle' });
-    await page.evaluate(() => document.fonts.ready);
-    if (!await page.evaluate(() => document.fonts.check("96px 'Instrument Serif'"))) throw new Error('Instrument Serif did not load');
-    await page.screenshot({ path: `${dir}/releases/v${v}.png` });
-    await page.close();
+    await shoot(html(v, accent(text)), { width: 1280, height: 640, out: `${dir}/v${v}.png` });
   }
-  await browser.close();
+  await close();
 })();

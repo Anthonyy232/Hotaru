@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "description": "Builds Hotaru's README, site and release images",
+  "devDependencies": {
+    "playwright": "1.65.1"
+  }
+}
