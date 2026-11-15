@@ -1,0 +1,37 @@
+name: Bug report
+description: Something in Hotaru doesn't work as it should
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected and what you got, and whether it was in the window or the immersive cinema.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Hotaru version
+      description: The commit you built from.
+      placeholder: 0.1.0, commit 1a2b3c4
+    validations:
+      required: true
+  - type: input
+    id: headset
+    attributes:
+      label: Headset and Horizon OS version
+      placeholder: Quest 3, v81
+    validations:
+      required: true
+  - type: input
+    id: server
+    attributes:
+      label: Jellyfin server version
+      placeholder: 12.0.1
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Output of `adb logcat` from around the problem, and for playback problems the file's video, audio and subtitle formats. Remove your server address first.
+      render: text
