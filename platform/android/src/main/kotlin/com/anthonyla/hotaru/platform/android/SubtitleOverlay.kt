@@ -41,6 +41,9 @@ internal class SubtitleOverlay(
     // Never attached to a window: it is laid out and drawn on the video frame thread only.
     private val view = SubtitleView(context).apply { setUserDefaultStyle(); setFractionalTextSize(SubtitleView.DEFAULT_TEXT_SIZE_FRACTION * textScale) }
     @Volatile var cues: List<Cue> = emptyList()
+    /** The fraction of the picture's height the subtitles are raised by. A styled track moves whole, its signs too. */
+    @Volatile var lift = 0f
+    private var drawnLift = 0f
     private var assFrames: AssFrames? = null
     private val assPaint = Paint(Paint.FILTER_BITMAP_FLAG)
     /** What the bitmap shows: the cue list, or libass's images. */
@@ -73,6 +76,12 @@ internal class SubtitleOverlay(
 
     override fun getBitmap(presentationTimeUs: Long): Bitmap {
         val track = ass.track
+        val lift = lift
+        if (lift != drawnLift) {
+            view.setBottomPaddingFraction(SubtitleView.DEFAULT_BOTTOM_PADDING_FRACTION + lift)
+            drawnLift = lift
+            drawn = null
+        }
         if (track == null) {
             val current = cues
             if (current !== drawn) {
@@ -87,6 +96,7 @@ internal class SubtitleOverlay(
             val images = frames.at(track, ass.videoTime - delayUs.get())
             if (images !== drawn) {
                 paint { canvas ->
+                    canvas.translate(0f, -lift * view.height)
                     for (image in images) {
                         // libass packs a colour as RGBA with the alpha inverted.
                         assPaint.color = Color.argb(255 - (image.color and 0xFF), image.color ushr 24, image.color shr 16 and 0xFF, image.color shr 8 and 0xFF)

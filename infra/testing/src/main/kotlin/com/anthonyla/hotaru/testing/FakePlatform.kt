@@ -131,6 +131,8 @@ class FakeMediaPlayer(val plan: PlaybackPlan, val headers: Map<String, String>) 
     var selectedSubtitle: String? = null
     var subtitleDelay = Duration.ZERO
         private set
+    var subtitleLift = 0f
+        private set
     var speed = 1f
         private set
 
@@ -141,6 +143,7 @@ class FakeMediaPlayer(val plan: PlaybackPlan, val headers: Map<String, String>) 
     override fun selectAudio(trackId: String) { selectedAudio = trackId }
     override fun selectSubtitle(trackId: String?) { selectedSubtitle = trackId }
     override fun setSubtitleDelay(delay: Duration) { subtitleDelay = delay }
+    override fun setSubtitleLift(fraction: Float) { subtitleLift = fraction }
     override fun setSpeed(speed: Float) { this.speed = speed }
     override fun setVolume(volume: Float) { this.volume.value = volume }
     override fun release() { released = true; state.value = PlayerState.Idle }

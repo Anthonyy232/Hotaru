@@ -206,6 +206,8 @@ internal class Media3Player(
 
     override fun setSubtitleDelay(delay: Duration) = subtitleDelayUs.set(delay.inWholeMicroseconds)
 
+    override fun setSubtitleLift(fraction: Float) { subtitleOverlay?.lift = fraction }
+
     override fun setSpeed(speed: Float) = player.setPlaybackSpeed(speed)
 
     override fun setVolume(volume: Float) { this.volume.value = volume; player.volume = this.volume.value }

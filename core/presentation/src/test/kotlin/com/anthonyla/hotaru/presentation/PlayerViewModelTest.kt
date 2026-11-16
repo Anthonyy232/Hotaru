@@ -204,11 +204,14 @@ class PlayerViewModelTest {
         runCurrent()
         vm.onIntent(PlayerIntent.SetSpeed(1.5f))
         vm.onIntent(PlayerIntent.ShiftSubtitles((-250).milliseconds))
+        vm.onIntent(PlayerIntent.LiftSubtitles(0.25f))
         assertEquals(1.5f, h.players.last.speed)
+        assertEquals(0.25f, h.players.last.subtitleLift)
 
         h.playback.retry().getOrThrow()
         runCurrent()
         assertEquals(1.5f, h.players.last.speed)
+        assertEquals(0.25f, h.players.last.subtitleLift)
 
         h.players.last.state.value = PlayerState.Ended
         runCurrent()

@@ -32,13 +32,20 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -86,13 +93,21 @@ import kotlin.time.Duration.Companion.seconds
 /**
  * The in-window player: [video] is the host's video surface, letterboxed to fill the window, under a floating control bar
  * along the bottom. The view model shows and hides it (a tap or pinch on the picture, auto-hide), never hover. The skip
- * button stays up while the controls are hidden.
+ * button stays up while the controls are hidden. Subtitles are part of the picture, so they are raised clear of the bar.
  */
 @Composable
 internal fun WindowPlayer(vm: PlayerViewModel, video: @Composable (Modifier) -> Unit) {
     val state by vm.state.collectAsState()
-    Box(Modifier.fillMaxSize().background(Color.Black), contentAlignment = Alignment.Center) {
-        video(Modifier.aspectRatio(state.stage.screen.aspectRatio))
+    var windowHeight by remember { mutableIntStateOf(0) }
+    var pictureHeight by remember { mutableIntStateOf(0) }
+    var barHeight by remember { mutableIntStateOf(0) }
+    val barInset = with(LocalDensity.current) { HotaruDimens.xl.roundToPx() }
+    val covered = if (state.controlsVisible && pictureHeight > 0) (barHeight + barInset - (windowHeight - pictureHeight) / 2f) / pictureHeight else 0f
+    val lift = covered.coerceIn(0f, MaxSubtitleLift)
+    LaunchedEffect(lift) { vm.onIntent(PlayerIntent.LiftSubtitles(lift)) }
+    DisposableEffect(Unit) { onDispose { vm.onIntent(PlayerIntent.LiftSubtitles(0f)) } }
+    Box(Modifier.fillMaxSize().background(Color.Black).onSizeChanged { windowHeight = it.height }, contentAlignment = Alignment.Center) {
+        video(Modifier.aspectRatio(state.stage.screen.aspectRatio).onSizeChanged { pictureHeight = it.height })
         ToggleControlsArea(vm)
         if (state.isBuffering) Spinner(size = 56.dp)
         Column(Modifier.align(Alignment.BottomCenter).padding(HotaruDimens.xl).widthIn(max = BarMaxWidth).keepTaps(), horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(HotaruDimens.md)) {
@@ -104,12 +119,15 @@ internal fun WindowPlayer(vm: PlayerViewModel, video: @Composable (Modifier) -> 
             ) {
                 Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(HotaruDimens.md)) {
                     if (state.showTrackPicker) TrackPicker(state, vm)
-                    ControlBar(state, vm)
+                    Box(Modifier.onSizeChanged { barHeight = it.height }) { ControlBar(state, vm) }
                 }
             }
         }
     }
 }
+
+/** A bar taller than this covers the subtitles rather than push them up the picture. */
+private const val MaxSubtitleLift = 0.4f
 
 /** The immersive controls panel: narrower than [RoomyBarWidth], so its bar shows icons only. */
 val CinemaControlsSize = DpSize(640.dp, 680.dp)

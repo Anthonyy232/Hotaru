@@ -166,6 +166,8 @@ sealed interface PlayerIntent {
     data class SetSpeed(val speed: Float) : PlayerIntent
     /** Later by this much, or earlier when negative. */
     data class ShiftSubtitles(val by: Duration) : PlayerIntent
+    /** The fraction of the picture's height that the controls cover at its bottom edge. */
+    data class LiftSubtitles(val fraction: Float) : PlayerIntent
     data object SkipSegment : PlayerIntent
     /** The size slider, 0..1 like [PlayerUiState.screenSizeFraction]. */
     data class ResizeScreen(val fraction: Float) : PlayerIntent
@@ -193,6 +195,7 @@ class PlayerViewModel @Inject constructor(
     private var pausedForHeadset = false
     /** Bumped by each input, which starts the auto-hide wait over. */
     private val inputs = MutableStateFlow(0)
+    private var subtitleLift = 0f
 
     init {
         launch {
@@ -232,6 +235,7 @@ class PlayerViewModel @Inject constructor(
         val p = session.player
         p.setSpeed(current.speed)
         p.setSubtitleDelay(current.subtitleDelay)
+        p.setSubtitleLift(subtitleLift)
         val snapshots = combine(p.state, p.position, p.duration, p.buffered, p.tracks, ::Snapshot)
         combine(snapshots, session.extras, session.activeSegment, ::Triple)
             .collectLatest { (snap, extras, seg) ->
@@ -272,6 +276,7 @@ class PlayerViewModel @Inject constructor(
                 player?.setSubtitleDelay(delay)
                 update { it.copy(subtitleDelay = delay) }
             }
+            is PlayerIntent.LiftSubtitles -> { subtitleLift = intent.fraction; player?.setSubtitleLift(intent.fraction) }
             PlayerIntent.SkipSegment -> session?.skipActiveSegment()
             is PlayerIntent.ResizeScreen -> setCinema { it.copy(cinemaScreenWidthMeters = ScreenGeometry.MIN_WIDTH_METERS + intent.fraction * SCREEN_WIDTH_SPAN) }
             is PlayerIntent.ScreenHeld -> update { it.copy(screenHeld = intent.held) }

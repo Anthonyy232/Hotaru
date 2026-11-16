@@ -134,6 +134,8 @@ interface MediaPlayer {
     fun selectSubtitle(trackId: String?)
     /** Shows subtitles this much later than their own times, or earlier when negative. Subtitles in the picture stay. */
     fun setSubtitleDelay(delay: Duration)
+    /** Raises subtitles by this fraction of the picture's height, clear of what covers its bottom edge. Subtitles in the picture stay. */
+    fun setSubtitleLift(fraction: Float)
     /** 1 is normal speed. */
     fun setSpeed(speed: Float)
     /** App-level volume 0..1. Never touches system volume (Meta rule). */
