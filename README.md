@@ -5,7 +5,7 @@
 
 Hotaru is a [Jellyfin](https://jellyfin.org) app for Meta Quest 3 and 3S. You browse your library in a window, play a video there, and move it at any point to an immersive cinema with a screen up to 12 metres wide.
 
-It is at version 0.1.0 and has no published builds yet, so for now you [build it yourself](#building-from-source). It needs Horizon OS v69 or newer and a Jellyfin server on 12.0 or newer. The images on this page are renders drawn from the app's own colours and layout, with invented titles.
+[Download the APK](#install) and sideload it; a Meta Horizon Store listing is in preparation. It needs Horizon OS v69 or newer and a Jellyfin server on 12.0 or newer. The images on this page are renders drawn from the app's own colours and layout, with invented titles.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset=".github/readme/feature-browse-dark.png">
