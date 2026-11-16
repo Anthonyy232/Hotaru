@@ -62,6 +62,10 @@ Plain `http` servers work, as do `https` servers with a certificate authority yo
 - **Skip segments**: Skip automatically, Ask or Never, set separately for intros, credits, and recaps and previews.
 - **Cinema surroundings**: the default for the immersive cinema.
 
+## Install
+
+Download `hotaru-<version>.apk` from the [latest release](https://github.com/Anthonyy232/Hotaru/releases/latest). With developer mode on and the headset connected over USB, install it with `adb install -r hotaru-<version>.apk`, or use a sideloading tool such as SideQuest. It needs Horizon OS v69 or newer and a Jellyfin server on 12.0 or newer. A Meta Horizon Store listing is in preparation.
+
 ## Building from source
 
 You need JDK 21 and the Android SDK, with `sdk.dir` set in `local.properties`.
