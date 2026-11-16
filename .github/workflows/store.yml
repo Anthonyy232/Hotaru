@@ -1,0 +1,69 @@
+name: Store
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to upload, e.g. v1.2.0
+        required: true
+      channel:
+        description: Meta Horizon Store release channel
+        type: choice
+        options: [ALPHA, BETA, RC, STORE]
+        default: ALPHA
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ inputs.tag || github.event.release.tag_name }}
+  cancel-in-progress: false
+
+env:
+  META_APP_ID: '1500675923122825'
+  AGE_GROUP: TEENS_AND_ADULTS
+  TAG: ${{ inputs.tag || github.event.release.tag_name }}
+  CHANNEL: ${{ inputs.channel || 'ALPHA' }}
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check the app secret is set
+        id: secret
+        env:
+          META_APP_SECRET: ${{ secrets.META_APP_SECRET }}
+        run: |
+          if [ -n "$META_APP_SECRET" ]; then
+            echo "set=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::META_APP_SECRET is not set; skipping the Meta Horizon Store upload."
+          fi
+
+      - name: Download the APK and the upload utility
+        if: steps.secret.outputs.set
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern "hotaru-$TAG.apk"
+          # Meta publishes only this unversioned link; log what was fetched
+          curl -fsSL -o ovr-platform-util 'https://www.oculus.com/download_app/?id=5159709737372459&access_token=OC%7C5159709737372459%7C'
+          chmod +x ovr-platform-util
+          ./ovr-platform-util version
+          sha256sum ovr-platform-util
+
+      - name: Upload it to the ${{ env.CHANNEL }} channel
+        if: steps.secret.outputs.set
+        env:
+          GH_TOKEN: ${{ github.token }}
+          META_APP_SECRET: ${{ secrets.META_APP_SECRET }}
+        run: |
+          # headings and bullets only; the utility takes newlines as literal \n
+          notes=$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json body --jq '.body | gsub("\r"; "")
+            | split("\n") | map(select(test("^(### |- )")) | sub("^### "; "")) | join("\\n")')
+          ./ovr-platform-util upload-quest-build \
+            --app-id "$META_APP_ID" --app-secret "$META_APP_SECRET" \
+            --apk "hotaru-$TAG.apk" --channel "$CHANNEL" --age-group "$AGE_GROUP" \
+            --notes "$notes" --disable-progress-bar
