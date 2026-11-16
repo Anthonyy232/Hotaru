@@ -94,8 +94,7 @@ internal class Media3Player(
             DefaultMediaSourceFactory(DefaultDataSource.Factory(context, httpFactory), DefaultExtractorsFactory().withAssMkvSupport(assParsers, ass))
                 .setSubtitleParserFactory(assParsers),
         )
-        // The FFmpeg extension decodes DTS/TrueHD/FLAC on device; Android downmixes it.
-        .setRenderersFactory(DelayedTextRenderers(context, subtitleDelayUs).setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER).withAssSupport(ass))
+        .setRenderersFactory(DelayedTextRenderers(context, subtitleDelayUs).withAssSupport(ass))
         .build()
         .also(ass::init)
         .apply {
