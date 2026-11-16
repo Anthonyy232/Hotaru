@@ -66,4 +66,4 @@ jobs:
           ./ovr-platform-util upload-quest-build \
             --app-id "$META_APP_ID" --app-secret "$META_APP_SECRET" \
             --apk "hotaru-$TAG.apk" --channel "$CHANNEL" --age-group "$AGE_GROUP" \
-            --notes "$notes" --disable-progress-bar
+            --notes "$notes" --disable-progress-bar --wait-for-postprocessing
