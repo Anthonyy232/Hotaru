@@ -18,6 +18,8 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
       - uses: actions/setup-java@v6.3.0
         with:
           distribution: temurin
@@ -30,6 +32,16 @@ jobs:
         run: |
           grep -q "versionName = \"${GITHUB_REF_NAME#v}\"" app/quest/build.gradle.kts
           test "$(gh release view "$GITHUB_REF_NAME" --json isDraft --jq .isDraft)" = true
+
+      - name: Check versionCode is higher than the previous release's
+        run: |
+          prev=$(git describe --tags --abbrev=0 --match 'v*' "$GITHUB_REF_NAME^" 2>/dev/null) || exit 0
+          new=$(grep -oP 'versionCode = \K\d+' app/quest/build.gradle.kts)
+          old=$(git show "$prev:app/quest/build.gradle.kts" | grep -oP 'versionCode = \K\d+')
+          if [ "$new" -le "$old" ]; then
+            echo "::error::versionCode $new must be higher than $old from $prev; the Meta Horizon Store rejects it otherwise."
+            exit 1
+          fi
 
       - name: Build the signed APK
         env:
