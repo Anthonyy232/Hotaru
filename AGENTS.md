@@ -67,7 +67,7 @@ A Jellyfin app for Meta Quest 3 and 3S: Kotlin, Compose, Media3 and the Meta Spa
 - Banner: on the orphan `media` branch, `node releases/banner.cjs <checkout> <version> "<highlight>"` writes `releases/v<version>.png`; reference its raw URL.
 - Generated images (`.github/readme/`, `site/img/`, the banners) are built from the `media` branch; its README has the steps.
 - Licensed MPL-2.0 because the app links Meta's proprietary Spatial SDK, which no GPL code can ship beside: never add a GPL dependency (Jellyfin's `media3-ffmpeg-decoder` was removed for this).
-- The Meta Horizon Store build is uploaded by the owner by hand. Raise `versionCode` for every upload; `targetSdk` stays at the level Meta's manifest rules allow.
+- Pushing the tag makes CI build the signed APK and attach it to the draft release, which must already exist. The same APK is uploaded to the Meta Horizon Store by hand. Raise `versionCode` for every upload; `targetSdk` stays at the level Meta's manifest rules allow.
 
 ## Agents
 
