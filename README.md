@@ -28,7 +28,7 @@ The window resizes freely, down to 640 × 400 dp. Everything works with hands or
 - **Subtitles**: SRT, ASS/SSA, WebVTT and TTML are drawn on the headset. Styled ASS tracks go through libass, so their fonts, positioning and animation are kept.
 - **Seeking**: chapter marks on the seek bar, and preview thumbnails while you scrub when the server has trickplay images.
 - **Segments**: intros, credits, and recaps and previews can each be skipped automatically, offered as a button, or left alone.
-- **Formats**: Hotaru asks for direct play first, then a remux, then a transcode. Video uses the headset's hardware decoders only, and HDR is passed through where they support it. Audio including DTS and TrueHD is decoded on the headset and downmixed to stereo, or the server can send stereo AAC instead.
+- **Formats**: Hotaru asks for direct play first, then a remux, then a transcode. Video uses the headset's hardware decoders only, and HDR is passed through where they support it. Audio the headset can decode is played directly and surround is downmixed to stereo; formats it cannot decode, such as DTS and TrueHD, are converted by the server.
 
 Playback pauses when you take the headset off and resumes when you put it back on. Progress is reported to the server, so other clients show the same resume points, and other Jellyfin clients can cast to Hotaru and control it.
 

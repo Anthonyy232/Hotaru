@@ -37,16 +37,19 @@ class AndroidCapabilitiesProvider(private val logger: Logger) : DeviceCapabiliti
             MediaFormat.MIMETYPE_VIDEO_MPEG2 to "mpeg2video",
         ).mapNotNull { (mime, codec) -> videoCapability(list, mime, codec) }
         val audio = listOf(
-            MediaFormat.MIMETYPE_AUDIO_OPUS to "opus", MediaFormat.MIMETYPE_AUDIO_VORBIS to "vorbis", MediaFormat.MIMETYPE_AUDIO_AC4 to "ac4",
+            MediaFormat.MIMETYPE_AUDIO_AAC to "aac", MediaFormat.MIMETYPE_AUDIO_MPEG to "mp3", MediaFormat.MIMETYPE_AUDIO_FLAC to "flac",
+            MediaFormat.MIMETYPE_AUDIO_OPUS to "opus", MediaFormat.MIMETYPE_AUDIO_VORBIS to "vorbis",
+            MediaFormat.MIMETYPE_AUDIO_AC3 to "ac3", MediaFormat.MIMETYPE_AUDIO_EAC3 to "eac3", MediaFormat.MIMETYPE_AUDIO_AC4 to "ac4",
+            MediaFormat.MIMETYPE_AUDIO_DTS to "dts", MediaFormat.MIMETYPE_AUDIO_DOLBY_TRUEHD to "truehd",
         ).filter { (mime, _) -> list.any { it.supports(mime) } }.map { it.second }.toSet() +
-            // The bundled Jellyfin FFmpeg build decodes these to PCM in software (cheap enough for audio); Media3 plays raw PCM itself.
-            setOf("aac", "ac3", "eac3", "dts", "truehd", "alac", "flac", "mp3", "pcm_s16le", "pcm_s24le")
+            // Media3 plays raw PCM itself.
+            setOf("pcm_s16le", "pcm_s24le")
 
         val caps = DeviceCapabilities(
             videoCodecs = video,
             audioCodecs = audio,
             containers = setOf("mp4", "m4v", "mkv", "webm", "mov", "ts", "m2ts", "ogv", "3gp"),
-            // FFmpeg decodes up to 7.1 and Android downmixes it to the headset's stereo.
+            // Android downmixes surround to the headset's stereo.
             maxAudioChannels = 8,
         )
         logger.info(TAG) { "probed: video=${video.map { "${it.codec}@${it.maxWidth}x${it.maxHeight}/${it.maxBitDepth}b L${it.maxLevel} hdr=${it.hdr}" }} audio=$audio" }
