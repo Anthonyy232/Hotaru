@@ -8,6 +8,7 @@ Generated images for [Hotaru](https://github.com/Anthonyy232/Hotaru), kept off `
 | `releases/banner.cjs`, `banners.json` | Release banners, `releases/v<version>.png`. |
 | `readme/build.cjs` | Every README, site and social image, written into a Hotaru checkout. |
 | `store/build.cjs` | The Meta Horizon Store cover art, icon and logo, `store/*.png`. |
+| `store/demo/` | An invented Jellyfin library and its server setup, for the store screenshots `store/screenshot-*.png`. |
 | `fonts/` | Instrument Serif and Inter, under the SIL Open Font License. Nothing is fetched at build time. |
 
 ## Setup
@@ -39,7 +40,52 @@ That records the highlight in `releases/banners.json` and writes `releases/v0.1.
 node store/build.cjs ../..
 ```
 
-That writes the five covers, `icon.png` (512x512) and the transparent `logo.png` into `store/`, at the sizes in Meta's [asset guidelines](https://developers.meta.com/horizon/resources/asset-guidelines/). The five store screenshots are not built here: Meta requires real captures from the headset.
+That writes the five covers, `icon.png` (512x512) and the transparent `logo.png` into `store/`, at the sizes in Meta's [asset guidelines](https://developers.meta.com/horizon/resources/asset-guidelines/).
+
+## Store screenshots
+
+Meta requires real captures from the headset, so `store/screenshot-1.png` to `-5.png` are taken from a debug build signed in to a throwaway Jellyfin server holding an invented library: no real titles or artwork appear. Needs a Quest on USB with developer mode, ffmpeg on `PATH`, and the Windows portable Jellyfin zip at a version the app accepts (repo.jellyfin.org, `server/windows/latest-stable/amd64`), unpacked somewhere disposable.
+
+1. The library, about 90 MB: 8 films and 2 shows with posters, backdrops, episode stills and NFO files; each video is its backdrop panning, with a quiet tone. Lantern Season S01E04 has chapters and an SRT track.
+
+   ```bash
+   node store/demo/library.cjs <library>
+   ```
+
+2. A server with its own folders and port, so it touches no other install. Before its first start, write `<data>/config/network.xml` with `InternalHttpPort` 8196 and `AutoDiscovery` false. Then:
+
+   ```bash
+   <jellyfin>/jellyfin.exe --datadir <data>/data --configdir <data>/config --cachedir <data>/cache --logdir <data>/log --webdir <jellyfin>/jellyfin-web --ffmpeg <jellyfin>/ffmpeg.exe
+   node store/demo/server.cjs http://127.0.0.1:8196 <library> Demo <password>
+   ```
+
+   That finishes first-run setup, adds the libraries with every internet provider off, scans, and marks items played, part-watched and favourite so Home has Continue Watching and Next Up.
+
+3. From the Hotaru checkout, reach it over USB (no firewall rule needed) and sign in as another account; accounts already on the headset stay saved:
+
+   ```powershell
+   adb reverse tcp:8196 tcp:8196
+   adb shell setprop debug.oculus.guardian_pause 1   # a headset on a desk otherwise waits behind the boundary prompt
+   tools/quest-deploy.ps1 -Server http://127.0.0.1:8196 -User Demo -Password <password>
+   ```
+
+4. Capture, tapping with `tools/quest-dev.ps1 tap` in dp:
+   - Home, the Movies tab, Perihelion's details, and Lantern Season S01E04 playing in the window with its controls shown: `tools/quest-dev.ps1 capture -Scale 2` each, which redraws the window at 2560x1600 with the video frame under it into `build/quest-run/window.png`.
+   - The cinema: Watch in immersive, `tools/quest-dev.ps1 recenter`, tap the controls panel so its bar shows, then take the headset's own screenshot, one undistorted eye at 1440x1440, written to `/sdcard/Oculus/Screenshots`:
+
+     ```bash
+     adb shell am startservice -n com.oculus.metacam/.capture.CaptureService -a TAKE_SCREENSHOT
+     ```
+
+5. Frame at 2560x1440 without adding anything: the browse shots fit on the store art's dark brown, the player is cropped to its 16:9 video, and the cinema eye is cropped to 16:9 around the screen and scaled up.
+
+   ```bash
+   ffmpeg -f lavfi -i color=c=0x2A1C14:s=2560x1440 -i window.png -filter_complex "[1]scale=2304:1440:flags=lanczos[w];[0][w]overlay=128:0,format=rgb24" -frames:v 1 store/screenshot-1.png
+   ffmpeg -i player.png -vf "crop=2560:1440:0:80,format=rgb24" store/screenshot-4.png
+   ffmpeg -i eye.jpg -vf "crop=1440:810:0:<top>,scale=2560:1440:flags=lanczos,format=rgb24" store/screenshot-5.png
+   ```
+
+6. Afterwards: Settings, Switch user, and pick the headset's usual account; `adb shell setprop debug.oculus.guardian_pause 0`; `adb reverse --remove tcp:8196`; delete the screenshots on the headset; stop the server and delete it and the library.
 
 ## README, site and social images
 
