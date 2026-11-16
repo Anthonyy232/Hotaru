@@ -13,7 +13,8 @@ android {
     defaultConfig {
         applicationId = "com.anthonyla.hotaru.quest"
         minSdk = HotaruAndroid.MIN_SDK
-        targetSdk = HotaruAndroid.COMPILE_SDK
+        // The Horizon Store accepts no higher for an app with an immersive activity.
+        targetSdk = 34
         versionCode = 1
         versionName = "0.1.0"
         //noinspection ChromeOsAbiSupport: the Spatial SDK ships arm64 only
