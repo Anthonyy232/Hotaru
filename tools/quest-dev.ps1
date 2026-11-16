@@ -7,6 +7,7 @@
 
 .EXAMPLE
   tools/quest-dev.ps1 capture                       # window.png or controls.png, plus eyes.png (compositor)
+  tools/quest-dev.ps1 capture -Scale 2              # the panel redrawn at 2x, video included
   tools/quest-dev.ps1 tap 120 80
   tools/quest-dev.ps1 swipe 700 600 700 200
   tools/quest-dev.ps1 back
@@ -15,7 +16,8 @@
 [CmdletBinding(PositionalBinding = $false)]
 param(
     [Parameter(Mandatory, Position = 0)][ValidateSet("capture", "tap", "swipe", "back", "recenter")][string]$Cmd,
-    [Parameter(ValueFromRemainingArguments)][float[]]$Coords = @()
+    [Parameter(ValueFromRemainingArguments)][float[]]$Coords = @(),
+    [float]$Scale = 1
 )
 $OutDir = "$PSScriptRoot\..\build\quest-run"
 $pkg = "com.anthonyla.hotaru.quest"
@@ -25,6 +27,7 @@ if ($Cmd -eq "capture") { adb shell run-as $pkg rm -f ($panels | ForEach-Object 
 
 $bc = @("shell", "am", "broadcast", "-a", "com.anthonyla.hotaru.DEV", "-p", $pkg, "--es", "cmd", $Cmd)
 $names = @("x", "y", "x2", "y2")
+if ($Scale -ne 1) { $bc += @("--ef", "scale", "$Scale") }
 for ($i = 0; $i -lt $Coords.Count; $i++) { $bc += @("--ef", $names[$i], "$($Coords[$i])") }
 adb @bc | Out-Null
 

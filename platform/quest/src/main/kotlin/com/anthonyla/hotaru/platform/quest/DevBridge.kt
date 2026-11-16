@@ -8,12 +8,22 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.ApplicationInfo
 import android.graphics.Bitmap
+import android.graphics.BlendMode
+import android.graphics.ColorSpace
+import android.graphics.HardwareRenderer
+import android.graphics.Paint
+import android.graphics.PixelFormat
+import android.graphics.RenderNode
+import android.hardware.HardwareBuffer
+import android.media.ImageReader
 import android.os.SystemClock
 import android.util.Log
 import android.view.InputDevice
 import android.view.MotionEvent
 import android.view.PixelCopy
+import android.view.SurfaceView
 import android.view.View
+import android.view.ViewGroup
 import java.io.File
 
 /**
@@ -41,7 +51,7 @@ class DevBridge(
         val view = panel()
         if (view == null || !view.isAttachedToWindow) { Log.w(TAG, "$panelName is not shown yet"); return }
         when (cmd) {
-            "capture" -> capture(view, goAsync())
+            "capture" -> intent.getFloatExtra("scale", 1f).let { if (it == 1f) capture(view, goAsync()) else render(view, it, goAsync()) }
             "tap", "swipe" -> {
                 val density = view.resources.displayMetrics.density
                 fun px(key: String) = intent.getFloatExtra(key, 0f) * density
@@ -75,6 +85,57 @@ class DevBridge(
             }
         }
         view.rootView.invalidate()
+    }
+
+    /**
+     * Redraws the panel's display lists at [scale] for sharper store screenshots. Hardware rendering, so hardware
+     * bitmaps still draw. A video SurfaceView is outside the view tree and only punches a hole in it, so its
+     * current frame is copied and drawn under the panel, as the compositor layers it.
+     */
+    private fun render(view: View, scale: Float, completion: PendingResult) {
+        val root = view.rootView
+        val video = root.surfaceViews().firstOrNull { it.isShown && it.width > 0 }
+        if (video == null) return render(root, scale, null, completion)
+        val frame = Bitmap.createBitmap((video.width * scale).toInt(), (video.height * scale).toInt(), Bitmap.Config.ARGB_8888)
+        PixelCopy.request(video, frame, { status ->
+            if (status != PixelCopy.SUCCESS) Log.w(TAG, "copy of $panelName video failed: $status")
+            render(root, scale, frame.takeIf { status == PixelCopy.SUCCESS }?.let { video to it }, completion)
+        }, video.handler)
+    }
+
+    private fun render(root: View, scale: Float, video: Pair<SurfaceView, Bitmap>?, completion: PendingResult) {
+        val (w, h) = (root.width * scale).toInt() to (root.height * scale).toInt()
+        val node = RenderNode(panelName).apply { setPosition(0, 0, w, h) }
+        node.beginRecording(w, h).also { canvas ->
+            canvas.save()
+            canvas.scale(scale, scale)
+            root.draw(canvas)
+            canvas.restore()
+            video?.let { (surface, frame) ->
+                val at = IntArray(2).also(surface::getLocationInWindow)
+                canvas.drawBitmap(frame, at[0] * scale, at[1] * scale, Paint().apply { blendMode = BlendMode.DST_OVER })
+            }
+        }
+        node.endRecording()
+        val reader = ImageReader.newInstance(w, h, PixelFormat.RGBA_8888, 1, HardwareBuffer.USAGE_GPU_COLOR_OUTPUT or HardwareBuffer.USAGE_GPU_SAMPLED_IMAGE)
+        val renderer = HardwareRenderer().apply { setSurface(reader.surface); setContentRoot(node) }
+        renderer.createRenderRequest().setWaitForPresent(true).syncAndDraw()
+        reader.acquireNextImage().use { image ->
+            val bitmap = Bitmap.wrapHardwareBuffer(image.hardwareBuffer!!, ColorSpace.get(ColorSpace.Named.SRGB))!!.copy(Bitmap.Config.ARGB_8888, false)
+            val file = File(activity.filesDir, "dev/$panelName.png").apply { parentFile?.mkdirs() }
+            file.outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
+            Log.i(TAG, "rendered $panelName ${w}x${h}")
+        }
+        renderer.destroy()
+        reader.close()
+        node.discardDisplayList()
+        completion.finish()
+    }
+
+    private fun View.surfaceViews(): Sequence<SurfaceView> = when (this) {
+        is SurfaceView -> sequenceOf(this)
+        is ViewGroup -> (0 until childCount).asSequence().flatMap { getChildAt(it).surfaceViews() }
+        else -> emptySequence()
     }
 
     /** Down at the first point, a move per further point, up at the last, 16 ms apart so Compose sees velocity. */
