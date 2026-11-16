@@ -15,8 +15,8 @@ android {
         minSdk = HotaruAndroid.MIN_SDK
         // The Horizon Store accepts no higher for an app with an immersive activity.
         targetSdk = 34
-        versionCode = 2
-        versionName = "0.1.0"
+        versionCode = 3
+        versionName = "0.1.1"
         //noinspection ChromeOsAbiSupport: the Spatial SDK ships arm64 only
         ndk { abiFilters += listOf("arm64-v8a") }
     }
