@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hotaru privacy policy</title>
+<meta name="description" content="Hotaru collects no data. It talks only to the Jellyfin server you sign in to.">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#17110E" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#FFF6E8" media="(prefers-color-scheme: light)">
+<link rel="canonical" href="https://anthonyy232.github.io/Hotaru/privacy.html">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top wrap">
+  <a class="mark" href="./" aria-label="Hotaru">
+    <svg viewBox="0 0 698 256" aria-hidden="true">
+      <g fill="none" stroke="currentColor" stroke-width="20" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M30 72V200M30 160A40 40 0 0 1 110 160"/>
+        <circle cx="194" cy="160" r="40"/>
+        <path d="M288 84V172A28 28 0 0 0 316 200H324M264 120H320"/>
+        <circle cx="404" cy="160" r="40"/>
+        <path d="M444 120V200"/>
+        <path d="M496 120V200M496 160A40 40 0 0 1 536 120H542"/>
+        <path d="M588 120V160A40 40 0 0 0 668 160V120M668 120V200"/>
+      </g>
+      <circle class="dot" cx="110" cy="193" r="17"/>
+    </svg>
+  </a>
+  <nav aria-label="Site">
+    <a href="./#features">Features</a>
+    <a href="./#build">Build</a>
+    <a href="https://github.com/Anthonyy232/Hotaru">GitHub</a>
+  </nav>
+</header>
+
+<main id="main" class="policy wrap">
+  <h1>Privacy <em>policy</em></h1>
+  <p class="updated">Last updated 15 November 2026</p>
+
+  <p>Hotaru is a client for Jellyfin servers. It collects no data: the developer runs no server, and the app has no analytics, advertising, crash reporting or tracking of any kind.</p>
+
+  <h2>What the app sends, and where</h2>
+  <p>Hotaru talks only to the Jellyfin server you sign in to. It sends that server your sign-in, a device name and identifier so the server can list the session, what you play and how far you got, and what the headset can decode. To find servers it sends a discovery message on your local network. Nothing is sent to the developer, to Meta by the app, or to anyone else.</p>
+  <p>What your server keeps is decided by whoever runs it and by <a href="https://jellyfin.org/">Jellyfin</a>, not by Hotaru.</p>
+
+  <h2>What stays on the headset</h2>
+  <p>The server address, your user name and the sign-in token, which is encrypted with a key held in the Android Keystore, plus your settings. <strong>Sign out and forget</strong> removes the account and ends its session on the server; uninstalling the app removes everything.</p>
+
+  <h2>Permissions</h2>
+  <p>Network access, to reach your server. Hand tracking and controller models, so you can point and select; this input is used on the headset and never recorded or sent. Passthrough is drawn by the headset itself: Hotaru cannot see or record the camera view.</p>
+
+  <h2>Changes and contact</h2>
+  <p>Changes to this policy are published on this page. Questions go to the <a href="https://github.com/Anthonyy232/Hotaru/issues">issue tracker</a>; the app's full source is on <a href="https://github.com/Anthonyy232/Hotaru">GitHub</a>.</p>
+</main>
+
+<footer class="wrap">
+  <p>Hotaru is licensed under the <a href="https://github.com/Anthonyy232/Hotaru/blob/main/LICENSE">Mozilla Public License 2.0</a>. It is an independent project, not affiliated with Jellyfin or Meta.</p>
+</footer>
+</body>
+</html>
