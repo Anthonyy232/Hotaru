@@ -1,12 +1,13 @@
 # Hotaru media
 
-Generated images for [Hotaru](https://github.com/Anthonyy232/Hotaru), kept off `main` so it stays light: the release banners, the README panels, the site images and the social preview.
+Generated images for [Hotaru](https://github.com/Anthonyy232/Hotaru), kept off `main` so it stays light: the release banners, the README panels, the site images, the social preview and the store art.
 
 | Path | What |
 | --- | --- |
 | `lib.cjs` | Shared by both scripts: the bundled fonts, the logo read from a Hotaru checkout, screenshots. |
 | `releases/banner.cjs`, `banners.json` | Release banners, `releases/v<version>.png`. |
 | `readme/build.cjs` | Every README, site and social image, written into a Hotaru checkout. |
+| `store/build.cjs` | The Meta Horizon Store cover art, icon and logo, `store/*.png`. |
 | `fonts/` | Instrument Serif and Inter, under the SIL Open Font License. Nothing is fetched at build time. |
 
 ## Setup
@@ -31,6 +32,14 @@ node releases/banner.cjs ../.. 0.1.0 "One short highlight"
 That records the highlight in `releases/banners.json` and writes `releases/v0.1.0.png` (1280x640). With only the checkout path it redraws every banner. Commit, push, and use the raw URL in the release notes:
 
 `https://raw.githubusercontent.com/Anthonyy232/Hotaru/media/releases/v0.1.0.png`
+
+## Store art
+
+```bash
+node store/build.cjs ../..
+```
+
+That writes the five covers, `icon.png` (512x512) and the transparent `logo.png` into `store/`, at the sizes in Meta's [asset guidelines](https://developers.meta.com/horizon/resources/asset-guidelines/). The five store screenshots are not built here: Meta requires real captures from the headset.
 
 ## README, site and social images
 
