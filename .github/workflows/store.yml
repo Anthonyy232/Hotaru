@@ -31,19 +31,7 @@ jobs:
   upload:
     runs-on: ubuntu-latest
     steps:
-      - name: Check the app secret is set
-        id: secret
-        env:
-          META_APP_SECRET: ${{ secrets.META_APP_SECRET }}
-        run: |
-          if [ -n "$META_APP_SECRET" ]; then
-            echo "set=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "::notice::META_APP_SECRET is not set; skipping the Meta Horizon Store upload."
-          fi
-
       - name: Download the APK and the upload utility
-        if: steps.secret.outputs.set
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -55,7 +43,6 @@ jobs:
           sha256sum ovr-platform-util
 
       - name: Upload it to the ${{ env.CHANNEL }} channel
-        if: steps.secret.outputs.set
         env:
           GH_TOKEN: ${{ github.token }}
           META_APP_SECRET: ${{ secrets.META_APP_SECRET }}
