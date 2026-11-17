@@ -166,7 +166,7 @@ sealed interface PlayerIntent {
     data class SetSpeed(val speed: Float) : PlayerIntent
     /** Later by this much, or earlier when negative. */
     data class ShiftSubtitles(val by: Duration) : PlayerIntent
-    /** The fraction of the picture's height that the controls cover at its bottom edge. */
+    /** Raises subtitles by this fraction of the picture's height, clear of the controls. */
     data class LiftSubtitles(val fraction: Float) : PlayerIntent
     data object SkipSegment : PlayerIntent
     /** The size slider, 0..1 like [PlayerUiState.screenSizeFraction]. */
