@@ -77,7 +77,7 @@ Meta requires real captures from the headset, so `store/screenshot-1.png` to `-5
      adb shell am startservice -n com.oculus.metacam/.capture.CaptureService -a TAKE_SCREENSHOT
      ```
 
-5. Frame at 2560x1440 without adding anything: the browse shots fit on the store art's dark brown, the player is cropped to its 16:9 video, and the cinema eye is cropped to 16:9 around the screen and scaled up.
+5. Frame at 2560x1440 without adding anything: the browse shots fit on the store art's dark brown, the player is cropped to its 16:9 video, and the cinema eye is cropped to 16:9 inside the screen and scaled up. Meta's pre-check rejects a screenshot with empty borders (VRC.Quest.Asset.5), so no black surroundings may show.
 
    ```bash
    ffmpeg -f lavfi -i color=c=0x2A1C14:s=2560x1440 -i window.png -filter_complex "[1]scale=2304:1440:flags=lanczos[w];[0][w]overlay=128:0,format=rgb24" -frames:v 1 store/screenshot-1.png
