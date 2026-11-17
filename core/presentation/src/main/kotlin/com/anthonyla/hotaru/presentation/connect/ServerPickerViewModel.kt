@@ -8,6 +8,7 @@ import com.anthonyla.hotaru.application.ports.DiscoveredServer
 import com.anthonyla.hotaru.application.ports.NetworkDiscovery
 import com.anthonyla.hotaru.application.ports.ServerStore
 import com.anthonyla.hotaru.application.servers.AddServer
+import com.anthonyla.hotaru.application.session.SessionManager
 import com.anthonyla.hotaru.domain.Account
 import com.anthonyla.hotaru.domain.Server
 import com.anthonyla.hotaru.domain.UserId
@@ -38,6 +39,7 @@ sealed interface ServerPickerIntent {
     data object Connect : ServerPickerIntent
     data class ConnectDiscovered(val server: DiscoveredServer) : ServerPickerIntent
     data class Pick(val server: Server) : ServerPickerIntent
+    data class Remove(val server: Server) : ServerPickerIntent
 }
 
 @AssistedInject
@@ -48,6 +50,7 @@ class ServerPickerViewModel(
     discovery: NetworkDiscovery,
     private val add: AddServer,
     private val restore: RestoreSession,
+    private val sessions: SessionManager,
 ) : ViewModel<ServerPickerState, ServerPickerIntent>(ServerPickerState(), scope) {
 
     @AssistedFactory
@@ -74,6 +77,7 @@ class ServerPickerViewModel(
                 val last = current.lastAccountFor(intent.server)
                 if (last != null) resume(intent.server, last.userId) else emit(ScreenEffect.SignIn(intent.server))
             }
+            is ServerPickerIntent.Remove -> launch { sessions.removeServer(intent.server) }
         }
     }
 

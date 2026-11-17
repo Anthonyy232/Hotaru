@@ -2,8 +2,14 @@ package com.anthonyla.hotaru.application
 
 import com.anthonyla.hotaru.application.auth.SignOut
 import com.anthonyla.hotaru.application.session.SessionEvent
+import com.anthonyla.hotaru.domain.Account
+import com.anthonyla.hotaru.domain.DeviceId
+import com.anthonyla.hotaru.domain.ServerId
 import com.anthonyla.hotaru.domain.ServerVersion
+import com.anthonyla.hotaru.domain.Session
+import com.anthonyla.hotaru.domain.UserId
 import com.anthonyla.hotaru.testing.ApplicationHarness
+import com.anthonyla.hotaru.testing.Fixtures
 import com.anthonyla.hotaru.testing.getOrThrow
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -121,14 +127,17 @@ class AuthAndServersTest {
     }
 
     @Test
-    fun `forgetting an offline account clears its local session and token`() = runTest {
+    fun `forgetting an offline account clears its local session, token and cached items`() = runTest {
         val h = ApplicationHarness(backgroundScope)
-        h.signedIn()
+        val server = h.signedIn()
+        val account = checkNotNull(h.sessions.active.value).account
+        h.cache.put(server.id, account.userId, Fixtures.auroraDrift, h.clock.now())
         h.fake.failNetwork = true
         SignOut(h.sessions)(forgetAccount = true)
         assertNull(h.sessions.active.value)
         assertTrue(h.secure.map.isEmpty())
         assertEquals(0, h.accounts.size)
+        assertNull(h.cache.get(server.id, account.userId, Fixtures.auroraDrift.id))
     }
 
     @Test
@@ -148,5 +157,40 @@ class AuthAndServersTest {
         assertTrue(h.fake.validTokens.isEmpty())
         assertTrue(h.secure.map.isEmpty())
         assertEquals(0, h.accounts.size)
+    }
+
+    @Test
+    fun `removing a server forgets its accounts, tokens and cached items and leaves another server's alone`() = runTest {
+        val h = ApplicationHarness(backgroundScope)
+        val server = h.signedIn()
+        val gone = checkNotNull(h.sessions.active.value).account
+        h.signIn(server, "Guest", "guest").getOrThrow()
+        val other = server.copy(id = ServerId("other"))
+        val kept = Account(other.id, UserId("user-quest"), "Quest", DeviceId("device"))
+        h.sessions.activate(other, Session(kept, "kept-token"))
+        val item = Fixtures.auroraDrift
+        h.cache.put(server.id, gone.userId, item, h.clock.now())
+        h.cache.put(other.id, kept.userId, item, h.clock.now())
+
+        h.sessions.removeServer(server)
+
+        assertEquals(listOf(other.id), h.servers.observeAll().first().map { it.id })
+        assertEquals(listOf(kept), h.accounts.observeAll().first())
+        assertEquals(listOf("kept-token"), h.secure.map.values.toList())
+        assertNull(h.cache.get(server.id, gone.userId, item.id))
+        assertNotNull(h.cache.get(other.id, kept.userId, item.id))
+        assertEquals(kept, h.sessions.active.value?.account)
+    }
+
+    @Test
+    fun `removing the server of the active session ends it and leaves nothing to restore`() = runTest {
+        val h = ApplicationHarness(backgroundScope)
+        val server = h.signedIn()
+
+        h.sessions.removeServer(server)
+
+        assertNull(h.sessions.active.value)
+        assertEquals(SessionEvent.SignedOut(server, forgotAccount = true), h.sessions.events.value)
+        assertIs<AppError.Unauthorized>(assertIs<Outcome.Failure>(h.restoreSession()).error)
     }
 }

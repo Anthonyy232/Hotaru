@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,6 +17,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -23,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.anthonyla.hotaru.domain.ServerId
 import com.anthonyla.hotaru.presentation.connect.ServerPickerIntent
 import com.anthonyla.hotaru.presentation.connect.ServerPickerViewModel
 import com.anthonyla.hotaru.ui.kit.ErrorLine
@@ -33,8 +38,12 @@ import com.anthonyla.hotaru.ui.kit.PrimaryTarget
 import com.anthonyla.hotaru.ui.kit.Spinner
 import com.anthonyla.hotaru.ui.kit.TextInput
 import com.anthonyla.hotaru.ui.kit.Wordmark
+import com.meta.spatial.uiset.button.DestructiveButton
 import com.meta.spatial.uiset.button.PrimaryButton
+import com.meta.spatial.uiset.button.SecondaryButton
+import com.meta.spatial.uiset.button.SecondaryCircleButton
 import com.meta.spatial.uiset.theme.icons.regular.Computer
+import com.meta.spatial.uiset.theme.icons.regular.Trash
 import com.meta.spatial.uiset.theme.icons.regular.WifiOn
 import com.meta.spatial.uiset.theme.icons.SpatialIcons
 import com.meta.spatial.uiset.theme.SpatialTheme
@@ -42,6 +51,7 @@ import com.meta.spatial.uiset.theme.SpatialTheme
 @Composable
 internal fun ServerPickerScreen(vm: ServerPickerViewModel) {
     val state by vm.state.collectAsState()
+    var removing by remember { mutableStateOf<ServerId?>(null) }
     CenteredPane(maxWidth = 760) {
         Column(verticalArrangement = Arrangement.spacedBy(HotaruDimens.sm)) {
             Wordmark()
@@ -52,10 +62,14 @@ internal fun ServerPickerScreen(vm: ServerPickerViewModel) {
             Section("Your servers") {
                 LazyColumn(Modifier.heightIn(max = 320.dp), verticalArrangement = Arrangement.spacedBy(HotaruDimens.sm)) {
                     items(state.servers, key = { it.id.value }) { server ->
-                        ListTile(
-                            icon = SpatialIcons.Regular.Computer, title = server.name, subtitle = server.baseUrl, trailing = state.lastAccountFor(server)?.name,
-                            onClick = { vm.onIntent(ServerPickerIntent.Pick(server)) },
-                        )
+                        if (removing == server.id) {
+                            ConfirmRemoveTile(server.name, onRemove = { vm.onIntent(ServerPickerIntent.Remove(server)) }, onCancel = { removing = null })
+                        } else {
+                            ListTile(SpatialIcons.Regular.Computer, server.name, server.baseUrl, onClick = { vm.onIntent(ServerPickerIntent.Pick(server)) }) {
+                                state.lastAccountFor(server)?.let { Text(it.name, style = SpatialTheme.typography.body2, color = HotaruColors.TextSecondary) }
+                                SecondaryCircleButton({ Icon(SpatialIcons.Regular.Trash, contentDescription = "Remove ${server.name}") }, { removing = server.id })
+                            }
+                        }
                     }
                 }
             }
@@ -87,22 +101,42 @@ internal fun ServerPickerScreen(vm: ServerPickerViewModel) {
 }
 
 @Composable
-private fun ListTile(icon: ImageVector, title: String, subtitle: String, onClick: () -> Unit, trailing: String? = null) {
+private fun ListTile(icon: ImageVector, title: String, subtitle: String, onClick: () -> Unit, trailing: @Composable RowScope.() -> Unit = {}) {
+    Tile(Modifier.clickable(onClick = onClick)) {
+        Icon(icon, null, modifier = Modifier.size(HotaruDimens.icon))
+        TileText(title, subtitle)
+        trailing()
+    }
+}
+
+/** Cancel sits where the tile's remove button was, so a second tap in the same place removes nothing. */
+@Composable
+private fun ConfirmRemoveTile(name: String, onRemove: () -> Unit, onCancel: () -> Unit) {
+    Tile {
+        TileText("Remove $name?", "Its saved sign-ins are removed from this headset too.")
+        DestructiveButton("Remove", onRemove)
+        SecondaryButton("Cancel", onCancel)
+    }
+}
+
+@Composable
+private fun Tile(modifier: Modifier = Modifier, content: @Composable RowScope.() -> Unit) {
     Row(
         Modifier
             .fillMaxWidth()
             .heightIn(min = HotaruDimens.hitTargetPrimary)
             .clip(HotaruShapes.group)
             .background(HotaruColors.Fill)
-            .clickable(onClick = onClick)
+            .then(modifier)
             .padding(horizontal = HotaruDimens.lg, vertical = HotaruDimens.sm),
-        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(HotaruDimens.lg),
-    ) {
-        Icon(icon, null, modifier = Modifier.size(HotaruDimens.icon))
-        Column(Modifier.weight(1f)) {
-            Text(title, style = SpatialTheme.typography.body1Strong, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Text(subtitle, style = SpatialTheme.typography.body2, color = HotaruColors.TextSecondary, maxLines = 1, overflow = TextOverflow.Ellipsis)
-        }
-        if (trailing != null) Text(trailing, style = SpatialTheme.typography.body2, color = HotaruColors.TextSecondary)
+        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(HotaruDimens.lg), content = content,
+    )
+}
+
+@Composable
+private fun RowScope.TileText(title: String, subtitle: String) {
+    Column(Modifier.weight(1f)) {
+        Text(title, style = SpatialTheme.typography.body1Strong, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text(subtitle, style = SpatialTheme.typography.body2, color = HotaruColors.TextSecondary, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }

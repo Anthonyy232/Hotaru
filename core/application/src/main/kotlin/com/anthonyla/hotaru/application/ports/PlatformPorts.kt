@@ -21,6 +21,7 @@ interface ServerStore {
     fun observeAll(): Flow<List<Server>>
     suspend fun get(id: ServerId): Server?
     suspend fun upsert(server: Server)
+    suspend fun remove(id: ServerId)
 }
 
 interface AccountStore {
@@ -38,6 +39,7 @@ interface ItemCache {
     suspend fun put(serverId: ServerId, userId: UserId, item: MediaItem, now: Instant)
     /** Drops [ids] for every user of the server. */
     suspend fun invalidate(serverId: ServerId, ids: Set<ItemId>)
+    suspend fun forget(serverId: ServerId, userId: UserId)
 }
 
 data class CachedItem(val item: MediaItem, val fetchedAt: Instant)

@@ -36,6 +36,7 @@ class RoomServerStore(private val dao: ServerDao) : ServerStore {
     override suspend fun upsert(server: Server) = dao.upsert(
         ServerEntity(server.id.value, server.name, server.baseUrl, server.version.toString(), server.lastSeen.toEpochMilliseconds()),
     )
+    override suspend fun remove(id: ServerId) = dao.delete(id.value)
 
     private fun toDomain(e: ServerEntity) = Server(
         ServerId(e.id), e.name, e.baseUrl, checkNotNull(ServerVersion.parse(e.version)) { "stored server version ${e.version}" }, Instant.fromEpochMilliseconds(e.lastSeenEpochMs),
@@ -67,6 +68,7 @@ class RoomItemCache(private val dao: ItemCacheDao) : ItemCache {
     override suspend fun put(serverId: ServerId, userId: UserId, item: MediaItem, now: Instant) =
         dao.upsert(ItemCacheEntity(serverId.value, userId.value, item.id.value, Json.encodeToString(MediaItem.serializer(), item), now.toEpochMilliseconds()))
     override suspend fun invalidate(serverId: ServerId, ids: Set<ItemId>) = dao.delete(serverId.value, ids.map { it.value })
+    override suspend fun forget(serverId: ServerId, userId: UserId) = dao.deleteUser(serverId.value, userId.value)
 }
 
 /**

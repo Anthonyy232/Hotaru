@@ -4,6 +4,7 @@ import com.anthonyla.hotaru.application.AppError
 import com.anthonyla.hotaru.application.failure
 import com.anthonyla.hotaru.application.Outcome
 import com.anthonyla.hotaru.application.ports.AccountStore
+import com.anthonyla.hotaru.application.ports.ItemCache
 import com.anthonyla.hotaru.application.ports.Logger
 import com.anthonyla.hotaru.application.ports.SecureStore
 import com.anthonyla.hotaru.application.ports.ServerConnection
@@ -20,6 +21,7 @@ import jakarta.inject.Singleton
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlin.time.Clock
@@ -48,6 +50,7 @@ class SessionManager @Inject constructor(
     private val servers: ServerStore,
     private val accounts: AccountStore,
     private val secureStore: SecureStore,
+    private val cache: ItemCache,
     private val clock: Clock,
     private val logger: Logger,
 ) {
@@ -85,12 +88,25 @@ class SessionManager @Inject constructor(
 
     suspend fun signOut(session: ActiveSession, forgetAccount: Boolean): Unit = mutex.withLock {
         if (_active.value !== session) return
-        if (forgetAccount) {
-            secureStore.delete(tokenKey(session.server.id, session.account.userId))
-            accounts.remove(session.server.id, session.account.userId)
-        }
+        if (forgetAccount) forget(session.account)
         _active.value = null
         _events.value = SessionEvent.SignedOut(session.server, forgetAccount)
+    }
+
+    /** Forgets [server], every account saved under it and their tokens. A session on it ends. */
+    suspend fun removeServer(server: Server): Unit = mutex.withLock {
+        accounts.observeAll().first().filter { it.serverId == server.id }.forEach { forget(it) }
+        servers.remove(server.id)
+        if (_active.value?.server?.id == server.id) {
+            _active.value = null
+            _events.value = SessionEvent.SignedOut(server, forgotAccount = true)
+        }
+    }
+
+    private suspend fun forget(account: Account) {
+        secureStore.delete(tokenKey(account.serverId, account.userId))
+        accounts.remove(account.serverId, account.userId)
+        cache.forget(account.serverId, account.userId)
     }
 
     /** The server answered 401 for [session]'s token. Ignored when a newer sign-in already replaced it. */

@@ -24,7 +24,7 @@ import kotlinx.coroutines.CoroutineScope
 class ApplicationHarness(scope: CoroutineScope) {
     val connections = FakeServerConnectionFactory()
     val fake = connections.server
-    private val servers = InMemoryServerStore()
+    val servers = InMemoryServerStore()
     val accounts = InMemoryAccountStore()
     val secure = InMemorySecureStore()
     val cache = InMemoryItemCache()
@@ -35,7 +35,7 @@ class ApplicationHarness(scope: CoroutineScope) {
     val stage = Stage(settings, scope)
     val userDataEvents = UserDataEvents(cache)
 
-    val sessions = SessionManager(connections, servers, accounts, secure, clock, NoopLogger)
+    val sessions = SessionManager(connections, servers, accounts, secure, cache, clock, NoopLogger)
     val addServer = AddServer(connections, servers, clock)
     val signIn = SignInWithPassword(sessions, connections)
     val quickConnect = QuickConnect(sessions, connections)

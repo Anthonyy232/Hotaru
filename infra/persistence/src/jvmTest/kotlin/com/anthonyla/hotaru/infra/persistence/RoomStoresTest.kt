@@ -44,6 +44,22 @@ class RoomStoresTest {
     }
 
     @Test
+    fun `removing a server leaves the others`() = runTest {
+        val db = inMemory()
+        val servers = RoomServerStore(db.servers())
+        val gone = Server(ServerId("s1"), "Old", "http://old.local:8096", ServerVersion(12, 2, 0), now)
+        val kept = gone.copy(id = ServerId("s2"), name = "Home")
+        servers.upsert(gone)
+        servers.upsert(kept)
+
+        servers.remove(gone.id)
+
+        assertNull(servers.get(gone.id))
+        assertEquals(listOf(kept), servers.observeAll().first())
+        db.close()
+    }
+
+    @Test
     fun `item cache round trips every kind`() = runTest {
         val db = inMemory()
         val cache = RoomItemCache(db.itemCache())
@@ -73,6 +89,25 @@ class RoomStoresTest {
         cache.invalidate(sid, setOf(item.id))
         assertNull(cache.get(sid, a, item.id))
         assertNull(cache.get(sid, b, item.id))
+        db.close()
+    }
+
+    @Test
+    fun `forgetting a user's cached items leaves other users' and other servers'`() = runTest {
+        val db = inMemory()
+        val cache = RoomItemCache(db.itemCache())
+        val (sid, other) = ServerId("s1") to ServerId("s2")
+        val (a, b) = UserId("a") to UserId("b")
+        val item = Fixtures.auroraDrift
+        cache.put(sid, a, item, now)
+        cache.put(sid, b, item, now)
+        cache.put(other, a, item, now)
+
+        cache.forget(sid, a)
+
+        assertNull(cache.get(sid, a, item.id))
+        assertNotNull(cache.get(sid, b, item.id))
+        assertNotNull(cache.get(other, a, item.id))
         db.close()
     }
 

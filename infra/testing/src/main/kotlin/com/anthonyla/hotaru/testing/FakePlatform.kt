@@ -55,6 +55,7 @@ class InMemoryServerStore : ServerStore {
     override fun observeAll(): Flow<List<Server>> = state.map { it.values.sortedByDescending { s -> s.lastSeen } }
     override suspend fun get(id: ServerId): Server? = state.value[id]
     override suspend fun upsert(server: Server) { state.update { it + (server.id to server) } }
+    override suspend fun remove(id: ServerId) { state.update { it - id } }
 }
 
 class InMemoryAccountStore : AccountStore {
@@ -72,6 +73,7 @@ class InMemoryItemCache : ItemCache {
     override suspend fun get(serverId: ServerId, userId: UserId, id: ItemId): CachedItem? = map[Triple(serverId, userId, id)]
     override suspend fun put(serverId: ServerId, userId: UserId, item: MediaItem, now: Instant) { map[Triple(serverId, userId, item.id)] = CachedItem(item, now) }
     override suspend fun invalidate(serverId: ServerId, ids: Set<ItemId>) { map.keys.removeAll { (server, _, id) -> server == serverId && id in ids } }
+    override suspend fun forget(serverId: ServerId, userId: UserId) { map.keys.removeAll { (server, user, _) -> server == serverId && user == userId } }
 }
 
 class InMemorySettingsStore : SettingsStore {

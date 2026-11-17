@@ -46,7 +46,7 @@ Playback pauses when you take the headset off and resumes when you put it back o
 
 ## Connecting
 
-Hotaru lists Jellyfin servers it finds on your network, and you can add one by address, such as `192.168.1.10:8096` or `https://jellyfin.example.com`. Servers you have used are remembered.
+Hotaru lists Jellyfin servers it finds on your network, and you can add one by address, such as `192.168.1.10:8096` or `https://jellyfin.example.com`. Servers you have used are remembered until you remove one with the bin on its row, which also removes the sign-ins saved for it.
 
 Sign in by picking a user and entering the password, or with **Quick Connect**: Hotaru shows a code, and you enter it in Jellyfin on your phone or computer.
 

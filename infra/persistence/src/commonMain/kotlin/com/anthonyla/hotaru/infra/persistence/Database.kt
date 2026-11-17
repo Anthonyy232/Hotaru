@@ -47,6 +47,7 @@ interface ServerDao {
     @Query("SELECT * FROM server ORDER BY lastSeenEpochMs DESC") fun observeAll(): Flow<List<ServerEntity>>
     @Query("SELECT * FROM server WHERE id = :id") suspend fun get(id: String): ServerEntity?
     @Upsert suspend fun upsert(server: ServerEntity)
+    @Query("DELETE FROM server WHERE id = :id") suspend fun delete(id: String)
 }
 
 @Dao
@@ -63,6 +64,7 @@ interface ItemCacheDao {
     @Query("SELECT * FROM item_cache WHERE serverId = :serverId AND userId = :userId AND itemId = :itemId") suspend fun get(serverId: String, userId: String, itemId: String): ItemCacheEntity?
     @Upsert suspend fun upsert(item: ItemCacheEntity)
     @Query("DELETE FROM item_cache WHERE serverId = :serverId AND itemId IN (:ids)") suspend fun delete(serverId: String, ids: List<String>)
+    @Query("DELETE FROM item_cache WHERE serverId = :serverId AND userId = :userId") suspend fun deleteUser(serverId: String, userId: String)
 }
 
 @Dao
