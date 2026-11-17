@@ -76,9 +76,7 @@ class DevBridge(
             PixelCopy.request(PixelCopy.Request.Builder.ofWindow(view).build(), activity.mainExecutor) { result ->
                 try {
                     if (result.status != PixelCopy.SUCCESS) { Log.w(TAG, "capture $panelName failed: ${result.status}"); return@request }
-                    val file = File(activity.filesDir, "dev/$panelName.png").apply { parentFile?.mkdirs() }
-                    file.outputStream().use { result.bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
-                    Log.i(TAG, "captured $panelName ${result.bitmap.width}x${result.bitmap.height}")
+                    save(result.bitmap)
                 } finally {
                     completion.finish()
                 }
@@ -121,15 +119,19 @@ class DevBridge(
         val renderer = HardwareRenderer().apply { setSurface(reader.surface); setContentRoot(node) }
         renderer.createRenderRequest().setWaitForPresent(true).syncAndDraw()
         reader.acquireNextImage().use { image ->
-            val bitmap = Bitmap.wrapHardwareBuffer(image.hardwareBuffer!!, ColorSpace.get(ColorSpace.Named.SRGB))!!.copy(Bitmap.Config.ARGB_8888, false)
-            val file = File(activity.filesDir, "dev/$panelName.png").apply { parentFile?.mkdirs() }
-            file.outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
-            Log.i(TAG, "rendered $panelName ${w}x${h}")
+            save(Bitmap.wrapHardwareBuffer(image.hardwareBuffer!!, ColorSpace.get(ColorSpace.Named.SRGB))!!.copy(Bitmap.Config.ARGB_8888, false))
         }
         renderer.destroy()
         reader.close()
         node.discardDisplayList()
         completion.finish()
+    }
+
+    /** Where tools/quest-dev.ps1 pulls it from. */
+    private fun save(bitmap: Bitmap) {
+        val file = File(activity.filesDir, "dev/$panelName.png").apply { parentFile?.mkdirs() }
+        file.outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
+        Log.i(TAG, "captured $panelName ${bitmap.width}x${bitmap.height}")
     }
 
     private fun View.surfaceViews(): Sequence<SurfaceView> = when (this) {
