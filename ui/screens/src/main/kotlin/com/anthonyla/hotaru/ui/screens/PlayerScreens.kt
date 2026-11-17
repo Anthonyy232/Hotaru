@@ -101,8 +101,9 @@ internal fun WindowPlayer(vm: PlayerViewModel, video: @Composable (Modifier) -> 
     var windowHeight by remember { mutableIntStateOf(0) }
     var pictureHeight by remember { mutableIntStateOf(0) }
     var barHeight by remember { mutableIntStateOf(0) }
-    val barInset = with(LocalDensity.current) { HotaruDimens.xl.roundToPx() }
-    val covered = if (state.controlsVisible && pictureHeight > 0) (barHeight + barInset - (windowHeight - pictureHeight) / 2f) / pictureHeight else 0f
+    val barInset = HotaruDimens.xl
+    val barInsetPx = with(LocalDensity.current) { barInset.roundToPx() }
+    val covered = if (state.controlsVisible && pictureHeight > 0) (barHeight + barInsetPx - (windowHeight - pictureHeight) / 2f) / pictureHeight else 0f
     val lift = covered.coerceIn(0f, MaxSubtitleLift)
     LaunchedEffect(lift) { vm.onIntent(PlayerIntent.LiftSubtitles(lift)) }
     DisposableEffect(Unit) { onDispose { vm.onIntent(PlayerIntent.LiftSubtitles(0f)) } }
@@ -110,7 +111,7 @@ internal fun WindowPlayer(vm: PlayerViewModel, video: @Composable (Modifier) -> 
         video(Modifier.aspectRatio(state.stage.screen.aspectRatio).onSizeChanged { pictureHeight = it.height })
         ToggleControlsArea(vm)
         if (state.isBuffering) Spinner(size = 56.dp)
-        Column(Modifier.align(Alignment.BottomCenter).padding(HotaruDimens.xl).widthIn(max = BarMaxWidth).keepTaps(), horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(HotaruDimens.md)) {
+        Column(Modifier.align(Alignment.BottomCenter).padding(barInset).widthIn(max = BarMaxWidth).keepTaps(), horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(HotaruDimens.md)) {
             state.skipSegmentLabel?.let { label -> SkipButton(label, vm) }
             AnimatedVisibility(
                 state.controlsVisible,
