@@ -10,6 +10,7 @@ import android.view.SurfaceHolder
 import androidx.annotation.OptIn
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
+import androidx.media3.common.Format
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MimeTypes
 import androidx.media3.common.PlaybackException
@@ -27,6 +28,8 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.ForwardingRenderer
 import androidx.media3.exoplayer.Renderer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+import androidx.media3.exoplayer.source.MergingMediaSource
+import androidx.media3.exoplayer.source.sideLoadedSubtitles
 import androidx.media3.exoplayer.text.TextOutput
 import androidx.media3.exoplayer.text.TextRenderer
 import androidx.media3.extractor.DefaultExtractorsFactory
@@ -75,7 +78,7 @@ internal class Media3Player(
     override val tracks = MutableStateFlow(PlayerTracks())
     override val volume = MutableStateFlow(1f)
 
-    private val httpFactory = OkHttpDataSource.Factory(okHttp).setDefaultRequestProperties(headers)
+    private val dataSource = DefaultDataSource.Factory(context, OkHttpDataSource.Factory(okHttp).setDefaultRequestProperties(headers))
     private val subtitleStreams = plan.streamSubtitles + plan.externalSubtitles.map { it.stream }
     // In this mode the library only loads a styled track and its fonts into libass, for the overlay to draw from; its cue
     // mode draws each line once, so nothing animates.
@@ -90,10 +93,6 @@ internal class Media3Player(
         .setAudioAttributes(AudioAttributes.Builder().setUsage(C.USAGE_MEDIA).setContentType(C.AUDIO_CONTENT_TYPE_MOVIE).build(), true)
         .setWakeMode(C.WAKE_MODE_NETWORK)
         .setHandleAudioBecomingNoisy(true)
-        .setMediaSourceFactory(
-            DefaultMediaSourceFactory(DefaultDataSource.Factory(context, httpFactory), DefaultExtractorsFactory().withAssMkvSupport(assParsers, ass))
-                .setSubtitleParserFactory(assParsers),
-        )
         .setRenderersFactory(DelayedTextRenderers(context, subtitleDelayUs).withAssSupport(ass))
         .build()
         .also(ass::init)
@@ -110,17 +109,14 @@ internal class Media3Player(
 
     init {
         subtitleOverlay?.let { player.setVideoEffects(listOf(OverlayEffect(listOf(it)))) }
-        player.setMediaItem(
+        val media = DefaultMediaSourceFactory(dataSource, DefaultExtractorsFactory().withAssMkvSupport(assParsers, ass)).setSubtitleParserFactory(assParsers)
             // Only HLS needs naming; Media3 finds a file's container itself.
-            MediaItem.Builder().setUri(plan.streamUrl.value).setMimeType(MimeTypes.APPLICATION_M3U8.takeIf { plan.isHls })
-                .setSubtitleConfigurations(
-                    plan.externalSubtitles.map {
-                        MediaItem.SubtitleConfiguration.Builder(Uri.parse(it.url.value))
-                            .setMimeType(it.format.mimeType).setLanguage(it.stream.language).setLabel(it.stream.displayTitle ?: it.stream.title).build()
-                    },
-                ).build(),
-            plan.startAt.milliseconds,
-        )
+            .createMediaSource(MediaItem.Builder().setUri(plan.streamUrl.value).setMimeType(MimeTypes.APPLICATION_M3U8.takeIf { plan.isHls }).build())
+        val subtitles = plan.externalSubtitles.map {
+            val format = Format.Builder().setSampleMimeType(it.format.mimeType).setLanguage(it.stream.language).setLabel(it.stream.displayTitle ?: it.stream.title).build()
+            sideLoadedSubtitles(dataSource, assParsers, Uri.parse(it.url.value), format)
+        }
+        player.setMediaSource(MergingMediaSource(media, *subtitles.toTypedArray()), plan.startAt.milliseconds)
         player.prepare()
         // Media3 has no position callback, so poll until release.
         scope.launch {
