@@ -1,4 +1,4 @@
-// node releases/banner.cjs <checkout> [<version> "<highlight>"] : 1280x640 release banners in releases/
+// node releases/banner.cjs <checkout> [<version> "<highlight>"] : release banners, 1280x640 at 2x, in releases/
 const fs = require('fs');
 const { logo, launch } = require('../lib.cjs');
 
@@ -39,7 +39,7 @@ const accent = text => text.replace(/(\S+)$/, '<i>$1</i>');
 (async () => {
   const { shoot, close } = await launch();
   for (const [v, text] of version ? [[version, highlight]] : Object.entries(banners)) {
-    await shoot(html(v, accent(text)), { width: 1280, height: 640, out: `${dir}/v${v}.png` });
+    await shoot(html(v, accent(text)), { width: 1280, height: 640, scale: 2, out: `${dir}/v${v}.png` });
   }
   await close();
 })();

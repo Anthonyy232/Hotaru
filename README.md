@@ -30,7 +30,7 @@ Both scripts take the path of the Hotaru checkout as their first argument; they 
 node releases/banner.cjs ../.. 0.1.0 "One short highlight"
 ```
 
-That records the highlight in `releases/banners.json` and writes `releases/v0.1.0.png` (1280x640). With only the checkout path it redraws every banner. Commit, push, and use the raw URL in the release notes:
+That records the highlight in `releases/banners.json` and writes `releases/v0.1.0.png` (1280x640 at 2x). With only the checkout path it redraws every banner. Commit, push, and use the raw URL in the release notes:
 
 `https://raw.githubusercontent.com/Anthonyy232/Hotaru/media/releases/v0.1.0.png`
 
