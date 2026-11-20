@@ -69,20 +69,21 @@ Meta requires real captures from the headset, so `store/screenshot-1.png` to `-5
    tools/quest-deploy.ps1 -Server http://127.0.0.1:8196 -User Demo -Password <password>
    ```
 
-4. Capture, tapping with `tools/quest-dev.ps1 tap` in dp:
-   - Home, the Movies tab, Perihelion's details, and Lantern Season S01E04 playing in the window with its controls shown: `tools/quest-dev.ps1 capture -Scale 2` each, which redraws the window at 2560x1600 with the video frame under it into `build/quest-run/window.png`.
-   - The cinema: Watch in immersive with the SRT track on, set the screen to 5.6 m and `tools/quest-dev.ps1 recenter`, then open Cinema settings and grow the screen to about 9.3 m so it fills the eye without moving back. Wait for a subtitle, then take the headset's own screenshot, one undistorted eye at 1440x1440, written to `/sdcard/Oculus/Screenshots`:
+4. Capture, tapping with `tools/quest-dev.ps1 tap` in dp (the window is 1024x640 dp, the cinema's controls 640 dp wide). `capture -Scale <n>` redraws the window at n times its 1280x800 pixels, with the video frame under it, into `build/quest-run/window.png`:
+   - Home and Perihelion's details at `-Scale 2.25`, the Movies tab scrolled up about 100 dp at `-Scale 2.56`, and Lantern Season S01E04 playing in the window with its controls shown at `-Scale 2`.
+   - The cinema: Watch in immersive with the SRT track on, pause on a subtitle, set the screen to about 5.5 m in Cinema settings and `tools/quest-dev.ps1 recenter`, then grow the screen to about 9 m so it fills the eye without moving back. The headset has to sit level and face straight ahead, or the screen comes out skewed. Take the headset's own screenshot, one undistorted eye at 1440x1440, written to `/sdcard/Oculus/Screenshots`:
 
      ```bash
      adb shell am startservice -n com.oculus.metacam/.capture.CaptureService -a TAKE_SCREENSHOT
      ```
 
-5. Frame at 2560x1440 without adding anything: the browse shots fit on the store art's dark brown, the player is cropped to its 16:9 video, and the cinema eye is cropped to the 16:9 band inside the screen (`crop=1440:810:0:520`) and scaled up. Meta's pre-check rejects a screenshot with empty borders (VRC.Quest.Asset.5), so no black surroundings may show; the controls panel sits below the screen and cannot be in the frame.
+5. Crop to 2560x1440 without adding or scaling anything in the window shots. Meta's review rejects a screenshot with a plain strip along any edge as having "empty borders" (VRC.Quest.Asset.5), so every edge has to cut through artwork or controls: the browse shots are cropped inside the app's panel, leaving out the rail and the rounded corners, the Movies shot runs from inside the first poster column to inside the last, the player is cropped to its 16:9 video, and the cinema eye is cropped to a 16:9 band inside the screen and scaled up. The controls panel sits below the cinema screen and cannot be in the frame.
 
    ```bash
-   ffmpeg -f lavfi -i color=c=0x2A1C14:s=2560x1440 -i window.png -filter_complex "[1]scale=2304:1440:flags=lanczos[w];[0][w]overlay=128:0,format=rgb24" -frames:v 1 store/screenshot-1.png
+   ffmpeg -i home.png -vf "crop=2560:1440:295:45,format=rgb24" store/screenshot-1.png      # details the same, as screenshot-3
+   ffmpeg -i movies.png -vf "crop=2560:1440:512:282,format=rgb24" store/screenshot-2.png
    ffmpeg -i player.png -vf "crop=2560:1440:0:80,format=rgb24" store/screenshot-4.png
-   ffmpeg -i eye.jpg -vf "crop=1440:810:0:<top>,scale=2560:1440:flags=lanczos,format=rgb24" store/screenshot-5.png
+   ffmpeg -i eye.jpg -vf "crop=1296:729:<left>:<top>,scale=2560:1440:flags=lanczos,format=rgb24" store/screenshot-5.png
    ```
 
 6. Afterwards: Settings, Switch user, and pick the headset's usual account; `adb shell setprop debug.oculus.guardian_pause 0`; `adb reverse --remove tcp:8196`; delete the screenshots on the headset; stop the server and delete it and the library.

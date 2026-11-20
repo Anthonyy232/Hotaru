@@ -11,6 +11,8 @@ if (!dir) throw new Error('usage: node store/demo/library.cjs <dir>');
 
 // Scenes are drawn on a 1600x900 canvas with the subject in the middle third, so a 2:3 poster is its centre crop.
 // `v` (0 to 1) varies the light for episode stills.
+// Lantern Season is the one that plays in the store screenshots: its clouds, hanging lanterns and reeds cross the top and bottom of
+// the frame wherever the pan is, because Meta's review reads a plain strip along an edge as an empty border.
 const grad = (id, a, b) => `<defs><linearGradient id="${id}" x2="0" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient></defs>`;
 const sky = (a, b) => `${grad('s', a, b)}<rect width="1600" height="900" fill="url(#s)"/>`;
 const hill = (fill, y, amp, shift = 0) => `<path fill="${fill}" d="M0 ${y} C${400 + shift} ${y - amp} ${800 + shift} ${y + amp} ${1200 + shift} ${y} S1550 ${y - amp} 1600 ${y - amp / 2} V900 H0z"/>`;
@@ -39,8 +41,12 @@ const scenes = {
     <path fill="#0B1430" d="M560 560 h480 l-60 70 h-360z"/><rect x="760" y="380" width="14" height="180" fill="#0B1430"/>`,
   lantern: v => `${grad('lt', '#3A2252', '#6E2E58')}<rect width="1600" height="900" fill="url(#lt)"/>
     <circle cx="${1000 - v * 260}" cy="${330 + v * 40}" r="250" fill="#F2AA62"/>
+    ${Array.from({ length: 6 }, (_, i) => [0, 70, 150].map((dx, j) => `<circle cx="${i * 300 - 40 + dx}" cy="${20 + ((i + j) % 2) * 34}" r="${88 - j * 10}" fill="#5B3A78"/>`).join('')).join('')}
     ${hill('#A0456A', 640, 70)}${hill('#4A2436', 770, 50, 100)}
-    ${Array.from({ length: 7 }, (_, i) => `<circle cx="${420 + i * 130 + v * 60}" cy="${500 - (i % 3) * 50}" r="5" fill="#FFF0B0"/>`).join('')}`,
+    ${Array.from({ length: 7 }, (_, i) => `<circle cx="${420 + i * 130 + v * 60}" cy="${500 - (i % 3) * 50}" r="5" fill="#FFF0B0"/>`).join('')}
+    ${Array.from({ length: 12 }, (_, i) => { const x = 60 + i * 135 + (i % 2) * 30, y = 150 + (i * 53) % 110; return `<rect x="${x - 2}" width="4" height="${y}" fill="#1E1230"/>
+      <rect x="${x - 17}" y="${y}" width="34" height="46" rx="12" fill="#FFCF7A"/><rect x="${x - 11}" y="${y - 6}" width="22" height="8" rx="3" fill="#1E1230"/>`; }).join('')}
+    ${Array.from({ length: 40 }, (_, i) => `<path fill="#22101C" d="M${i * 41 + 4} 900 Q${i * 41 + 10 + (i % 3) * 8} ${800 - (i % 5) * 26} ${i * 41 + 26 - (i % 4) * 12} ${700 - (i * 37) % 80} Q${i * 41 + 22} ${810 - (i % 5) * 20} ${i * 41 + 18} 900z"/>`).join('')}`,
   sea: v => `<rect width="1600" height="900" fill="#0F3049"/><circle cx="${700 + v * 300}" cy="200" r="120" fill="#9EDFD2"/>
     ${['#1D6582', '#123D57', '#1D6582', '#0C2A40', '#1D6582'].map((c, i) => hill(c, 400 + i * 110, 40 * (i % 2 ? 1 : -1), v * 200)).join('')}`,
 };
