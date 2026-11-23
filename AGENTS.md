@@ -68,7 +68,7 @@ A Jellyfin app for Meta Quest 3 and 3S: Kotlin, Compose, Media3 and the Meta Spa
 - Notes: banner image first, then `### New`, `### Improved`, `### Fixed` (only those that apply). One line per change, written for users; no internals, dependency lists or test counts. End with the install link(s) and the full changelog link.
 - Banner: built and hosted on the `media` branch; reference its raw URL.
 - Pushing the tag makes CI build the signed APK and attach it to the draft release, which must already exist. Raise `versionCode` for every release: CI fails the tag if it isn't higher than the previous tag's. `targetSdk` stays at the level Meta's manifest rules allow.
-- Publishing the release uploads that APK to the Meta Horizon Store's ALPHA channel. For another channel, including `STORE` (production), run the Store workflow by hand.
+- Publishing the release uploads that APK to the Meta Horizon Store's ALPHA channel. To move that build to another channel, including `STORE` (production), run the Store workflow by hand; Meta refuses a second upload of the same `versionCode`.
 
 ## Agents
 

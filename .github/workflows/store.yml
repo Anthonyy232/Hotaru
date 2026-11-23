@@ -5,52 +5,58 @@ on:
     types: [published]
   workflow_dispatch:
     inputs:
-      tag:
-        description: Release tag to upload, e.g. v1.2.0
-        required: true
       channel:
-        description: Meta Horizon Store release channel
+        description: Meta Horizon Store release channel to copy the ALPHA build to
         type: choice
-        options: [ALPHA, BETA, RC, STORE]
-        default: ALPHA
+        options: [BETA, RC, STORE]
+        default: STORE
 
 permissions:
   contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ inputs.tag || github.event.release.tag_name }}
+  group: ${{ github.workflow }}
   cancel-in-progress: false
 
 env:
   META_APP_ID: '1500675923122825'
   AGE_GROUP: TEENS_AND_ADULTS
-  TAG: ${{ inputs.tag || github.event.release.tag_name }}
-  CHANNEL: ${{ inputs.channel || 'ALPHA' }}
 
 jobs:
-  upload:
+  store:
     runs-on: ubuntu-latest
     steps:
-      - name: Download the APK and the upload utility
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Download the upload utility
         run: |
-          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern "hotaru-$TAG.apk"
           # Meta publishes only this unversioned link; log what was fetched
           curl -fsSL -o ovr-platform-util 'https://www.oculus.com/download_app/?id=5159709737372459&access_token=OC%7C5159709737372459%7C'
           chmod +x ovr-platform-util
           ./ovr-platform-util version
           sha256sum ovr-platform-util
 
-      - name: Upload it to the ${{ env.CHANNEL }} channel
+      - name: Upload the release APK to the ALPHA channel
+        if: github.event_name == 'release'
         env:
           GH_TOKEN: ${{ github.token }}
           META_APP_SECRET: ${{ secrets.META_APP_SECRET }}
+          TAG: ${{ github.event.release.tag_name }}
         run: |
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern "hotaru-$TAG.apk"
           # headings and bullets only; the utility takes newlines as literal \n
           notes=$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json body --jq '.body | gsub("\r"; "")
-            | split("\n") | map(select(test("^(### |- )")) | sub("^### "; "")) | join("\\n")')
+            | split("\n") | map(select(test("^(### |- )")) | sub("^### "; "")) | join("\n")')
           ./ovr-platform-util upload-quest-build \
             --app-id "$META_APP_ID" --app-secret "$META_APP_SECRET" \
-            --apk "hotaru-$TAG.apk" --channel "$CHANNEL" --age-group "$AGE_GROUP" \
+            --apk "hotaru-$TAG.apk" --channel ALPHA --age-group "$AGE_GROUP" \
             --notes "$notes" --disable-progress-bar --wait-for-postprocessing
+
+      # Meta refuses a second upload of the same versionCode, so later channels get ALPHA's build.
+      - name: Copy the ALPHA build to the ${{ inputs.channel }} channel
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          META_APP_SECRET: ${{ secrets.META_APP_SECRET }}
+          CHANNEL: ${{ inputs.channel }}
+        run: |
+          ./ovr-platform-util set-release-channel-build \
+            --app-id "$META_APP_ID" --app-secret "$META_APP_SECRET" --age-group "$AGE_GROUP" \
+            --source-channel ALPHA --destination-channel "$CHANNEL"
