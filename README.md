@@ -5,7 +5,7 @@
 
 Hotaru is a [Jellyfin](https://jellyfin.org) app for Meta Quest 3 and 3S. You browse your library in a window, play a video there, and move it at any point to an immersive cinema with a screen up to 12 metres wide.
 
-[Download the APK](#install) and sideload it; a Meta Horizon Store listing is in preparation. It needs Horizon OS v69 or newer and a Jellyfin server on 12.0 or newer. The images on this page are renders drawn from the app's own colours and layout, with invented titles.
+Get it on the [Meta Horizon Store](https://www.meta.com/experiences/hotaru/1500675923122825/), or [download the APK](#install) and sideload it. It needs Horizon OS v69 or newer and a Jellyfin server on 12.0 or newer. The images on this page are renders drawn from the app's own colours and layout, with invented titles.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset=".github/readme/feature-browse-dark.png">
@@ -64,7 +64,9 @@ Plain `http` servers work, as do `https` servers with a certificate authority yo
 
 ## Install
 
-Download `hotaru-<version>.apk` from the [latest release](https://github.com/Anthonyy232/Hotaru/releases/latest). With developer mode on and the headset connected over USB, install it with `adb install -r hotaru-<version>.apk`, or use a sideloading tool such as SideQuest. It needs Horizon OS v69 or newer and a Jellyfin server on 12.0 or newer. A Meta Horizon Store listing is in preparation.
+Install it from the [Meta Horizon Store](https://www.meta.com/experiences/hotaru/1500675923122825/).
+
+To sideload instead, download `hotaru-<version>.apk` from the [latest release](https://github.com/Anthonyy232/Hotaru/releases/latest). With developer mode on and the headset connected over USB, install it with `adb install -r hotaru-<version>.apk`, or use a sideloading tool such as SideQuest. It needs Horizon OS v69 or newer and a Jellyfin server on 12.0 or newer.
 
 ## Building from source
 
