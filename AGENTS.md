@@ -32,6 +32,7 @@ A Jellyfin app for Meta Quest 3 and 3S: Kotlin, Compose, Media3 and the Meta Spa
 - The UI looks like visionOS: glass with one warm accent, defined once in the shared tokens. Build with Meta's Spatial UI set and keep its control sizes and hit targets.
 - A green build doesn't prove the scene works, and there is no emulator: UI and playback changes can only be verified on a headset, with hands and controllers.
 - Never commit a server address, credentials or signing material.
+- Licensed MPL-2.0 because the app links Meta's proprietary Spatial SDK: never add a GPL dependency.
 
 ## Done means
 
@@ -45,6 +46,7 @@ A Jellyfin app for Meta Quest 3 and 3S: Kotlin, Compose, Media3 and the Meta Spa
 - README is for users: what it does, how to get it, how to use it. No internals, no agent instructions.
 - This file is for agents: only what can't be found quickly in the code.
 - No meta docs in the repo (notes, audits, plans, reports).
+- Generated images are built from the orphan `media` branch; its README has the steps.
 
 ## Git
 
@@ -64,11 +66,9 @@ A Jellyfin app for Meta Quest 3 and 3S: Kotlin, Compose, Media3 and the Meta Spa
 - Bump commit `chore: release vX.Y.Z`; tag `vX.Y.Z`, which must match the app's `versionName`.
 - Title `Hotaru X.Y.Z`.
 - Notes: banner image first, then `### New`, `### Improved`, `### Fixed` (only those that apply). One line per change, written for users; no internals, dependency lists or test counts. End with the install link(s) and the full changelog link.
-- Banner: on the orphan `media` branch, `node releases/banner.cjs <checkout> <version> "<highlight>"` writes `releases/v<version>.png`; reference its raw URL.
-- Generated images (`.github/readme/`, `site/img/`, the banners) are built from the `media` branch; its README has the steps.
-- Licensed MPL-2.0 because the app links Meta's proprietary Spatial SDK, which no GPL code can ship beside: never add a GPL dependency (Jellyfin's `media3-ffmpeg-decoder` was removed for this).
+- Banner: built and hosted on the `media` branch; reference its raw URL.
 - Pushing the tag makes CI build the signed APK and attach it to the draft release, which must already exist. Raise `versionCode` for every release: CI fails the tag if it isn't higher than the previous tag's. `targetSdk` stays at the level Meta's manifest rules allow.
-- Publishing the release uploads that APK to the Meta Horizon Store's ALPHA channel with the `META_APP_SECRET` secret. For another channel, including `STORE` (production), run the Store workflow by hand.
+- Publishing the release uploads that APK to the Meta Horizon Store's ALPHA channel. For another channel, including `STORE` (production), run the Store workflow by hand.
 
 ## Agents
 
