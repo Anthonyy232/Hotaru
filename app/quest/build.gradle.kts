@@ -16,8 +16,8 @@ android {
         // The Horizon Store accepts no higher for an app with an immersive activity.
         //noinspection OldTargetApi
         targetSdk = 34
-        versionCode = 3
-        versionName = "0.1.1"
+        versionCode = 4
+        versionName = "0.1.2"
         //noinspection ChromeOsAbiSupport: the Spatial SDK ships arm64 only
         ndk { abiFilters += listOf("arm64-v8a") }
     }
