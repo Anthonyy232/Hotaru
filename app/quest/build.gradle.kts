@@ -14,6 +14,7 @@ android {
         applicationId = "com.anthonyla.hotaru.quest"
         minSdk = HotaruAndroid.MIN_SDK
         // The Horizon Store accepts no higher for an app with an immersive activity.
+        //noinspection OldTargetApi
         targetSdk = 34
         versionCode = 3
         versionName = "0.1.1"
