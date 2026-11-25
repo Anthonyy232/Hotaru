@@ -4,6 +4,13 @@
 </picture>
 
 <p align="center">
+  <a href="https://github.com/Anthonyy232/Hotaru/releases/latest"><img src="https://img.shields.io/github/v/release/Anthonyy232/Hotaru?style=flat-square" alt="Latest release"></a>
+  <a href="https://github.com/Anthonyy232/Hotaru/releases"><img src="https://img.shields.io/github/downloads/Anthonyy232/Hotaru/total?style=flat-square" alt="Total downloads"></a>
+  <a href="https://github.com/Anthonyy232/Hotaru/actions/workflows/checks.yml"><img src="https://img.shields.io/github/actions/workflow/status/Anthonyy232/Hotaru/checks.yml?style=flat-square&label=CI" alt="CI"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/Anthonyy232/Hotaru?style=flat-square" alt="License"></a>
+</p>
+
+<p align="center">
   <a href="https://www.meta.com/experiences/hotaru/1500675923122825/"><b>Get Hotaru on the Meta Horizon Store</b></a>
   &nbsp;·&nbsp;
   <a href="https://github.com/Anthonyy232/Hotaru/releases/latest"><b>Download the APK</b></a>
@@ -90,7 +97,7 @@ A release build reads its signing key from `hotaru.keystore`, `hotaru.keystorePa
 
 ## Contributing
 
-[AGENTS.md](AGENTS.md) describes the conventions. Before sending a change, run:
+Contributions are welcome. Report bugs in [issues](https://github.com/Anthonyy232/Hotaru/issues), suggest features in [Discussions](https://github.com/Anthonyy232/Hotaru/discussions). [AGENTS.md](AGENTS.md) describes the conventions. Before sending a change, run:
 
 ```
 ./gradlew check :app:quest:assembleDebug
