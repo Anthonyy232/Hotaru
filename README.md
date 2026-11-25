@@ -3,6 +3,14 @@
   <img src=".github/readme/hero-light.png" alt="Hotaru: your library, on a giant screen. The home screen shows a featured episode with Resume and Details.">
 </picture>
 
+<p align="center">
+  <a href="https://www.meta.com/experiences/hotaru/1500675923122825/"><b>Get Hotaru on the Meta Horizon Store</b></a>
+  &nbsp;·&nbsp;
+  <a href="https://github.com/Anthonyy232/Hotaru/releases/latest"><b>Download the APK</b></a>
+  &nbsp;·&nbsp;
+  <a href="https://anthonyy232.github.io/Hotaru/"><b>Website</b></a>
+</p>
+
 Hotaru is a [Jellyfin](https://jellyfin.org) app for Meta Quest 3 and 3S. You browse your library in a window, play a video there, and move it at any point to an immersive cinema with a screen up to 12 metres wide.
 
 Get it on the [Meta Horizon Store](https://www.meta.com/experiences/hotaru/1500675923122825/), or [download the APK](#install) and sideload it. It needs Horizon OS v69 or newer and a Jellyfin server on 12.0 or newer. The images on this page are renders drawn from the app's own colours and layout, with invented titles.
@@ -91,6 +99,8 @@ A release build reads its signing key from `hotaru.keystore`, `hotaru.keystorePa
 Changes to the scene, playback or UI also need checking on a headset, in the window and in the cinema.
 
 The logo and its colours are in [branding](branding/guidelines.md).
+
+If Hotaru is useful to you, you can support it through [GitHub Sponsors](https://github.com/sponsors/Anthonyy232).
 
 ## License
 
